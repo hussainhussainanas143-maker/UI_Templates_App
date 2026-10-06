@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BuildTrack AI - Construction Intelligence</title><style>:root{--bg:#ecebe6;--ink:#262626;--y:#ffc400;--card:#fff;--red:#d64531;--amb:#e59a00;--grn:#2e8b57;--mut:#6d6a63;--line:#d4d1c8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+h1,h2{margin:0;font-family:"Arial Narrow","Segoe UI",sans-serif;text-transform:none}h1{font-size:1.5rem}h2{font-size:1rem;margin-bottom:8px}small{font-weight:400;color:var(--mut)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 20px;background:var(--y);border-bottom:6px solid var(--ink);background-image:repeating-linear-gradient(135deg,transparent 0 14px,rgba(0,0,0,.05) 14px 28px)}
+.demo{background:var(--ink);color:var(--y);padding:3px 10px;font-weight:700;font-size:.75rem}.wk{margin-left:auto;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px 20px}.k{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--y);padding:8px 12px}.k.bad{border-left-color:var(--red)}.k b{display:block;font:700 1.6rem "Arial Narrow",sans-serif}.k span{font-size:.78rem;color:var(--mut)}
+main{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 20px 20px}.c{background:var(--card);border:1px solid var(--line);padding:14px;min-width:0}.wide{grid-column:span 2}.ai{grid-column:1/-1}.state{padding:12px;color:var(--mut)}
+input,select,button,summary{font:inherit}input,select,button{padding:7px 10px;border:1px solid #bbb;background:#fff}button{cursor:pointer}button:hover{background:#f6f0d6}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.tools input{flex:1;min-width:150px}summary{cursor:pointer;margin-top:10px;font-weight:600}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin-top:8px}.form button{background:var(--ink);color:var(--y);border:0;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}.pc{border:1px solid var(--line);border-top:5px solid var(--grn);padding:10px;background:#faf9f5}.pc.Medium{border-top-color:var(--amb)}.pc.High{border-top-color:var(--red)}.pc[aria-current=true]{box-shadow:0 0 0 2px var(--ink)}
+.pc h3{margin:0;font-size:.95rem}.badge{font-size:.72rem;padding:1px 8px;background:var(--line);font-weight:700}.badge.High{background:var(--red);color:#fff}.badge.Medium{background:var(--amb);color:#fff}
+.bar{height:8px;background:var(--line);margin:4px 0}.bar i{display:block;height:100%;background:var(--ink)}.pc input[type=range]{width:100%;padding:0}.pc button{margin-top:4px;font-size:.8rem}
+.rm{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}.rc{min-height:58px;padding:3px;font-size:.72rem}.r0{background:#cfe8d6}.r1{background:#f6e3b0}.r2{background:#efb7ad}.rc span{display:inline-block;background:var(--ink);color:#fff;padding:0 5px;margin:1px;border-radius:8px}
+.g{position:relative;margin-bottom:8px}.gl{font-size:.78rem}.gt{position:relative;height:16px;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 4.1666%)}.gb{position:absolute;top:2px;height:12px;background:#bfb9a3}.gb i{display:block;height:100%;background:var(--y);border-right:2px solid var(--ink)}.td{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--red)}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.col{background:#f4f2ec;padding:8px;min-height:80px}.col h3{margin:0 0 6px;font-size:.85rem}.tk{background:#fff;border:1px solid var(--line);border-left:4px solid var(--amb);padding:6px;margin-bottom:6px;font-size:.82rem}.tk.over{border-left-color:var(--red)}.tk button{padding:0 8px;margin:3px 3px 0 0;font-size:.75rem}
+.brow{font-size:.82rem}.mini{list-style:none;margin:0 0 10px;padding:0}.mini li{padding:5px 8px;border-left:4px solid var(--y);background:#f4f2ec;margin-bottom:4px;font-size:.85rem}.mini li.bad{border-color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.out{border-left:5px solid var(--y);background:#f4f2ec;padding:10px 12px;white-space:pre-line}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--y);padding:8px 18px;z-index:5}
+@media(max-width:1000px){main{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){main{grid-template-columns:1fr;padding:0 12px 16px}.wide{grid-column:auto}.board{grid-template-columns:1fr}.kpis,.top{padding-left:12px;padding-right:12px}}
+</style></head>
+<body>
+<header class="top"><h1>BuildTrack AI</h1><span class="demo">DEMO DATA - fictional projects</span><span class="wk">Week 12</span></header>
+<section class="kpis" id="kpis" aria-label="Key figures"></section>
+<div id="state" class="state" role="status">Loading project data...</div>
+<main id="main" hidden>
+<section class="c wide"><h2>Projects</h2><div class="tools"><input id="q" type="search" placeholder="Search projects" aria-label="Search projects"><select id="f" aria-label="Filter risk"><option value="">All risk levels</option><option>High</option><option>Medium</option><option>Low</option></select><select id="s" aria-label="Sort"><option value="risk">Sort: risk</option><option value="prog">Sort: progress</option><option value="name">Sort: name</option></select></div><div id="cards" class="cards"></div><p id="empty" class="state" hidden>No projects match. Clear the search or choose "All risk levels".</p>
+<details><summary>Add project</summary><div class="form"><input id="pn" placeholder="Project name" aria-label="Project name"><input id="pb" type="number" placeholder="Budget (thousands)" aria-label="Budget"><input id="ps" type="number" placeholder="Start week" aria-label="Start week"><input id="pe" type="number" placeholder="End week" aria-label="End week"><button id="pa">Add project</button></div></details></section>
+<section class="c"><h2>Risk matrix</h2><div id="rm" class="rm"></div></section>
+<section class="c wide"><h2>Gantt timeline</h2><div id="gantt"></div></section>
+<section class="c"><h2>Budget used</h2><div id="bud"></div></section>
+<section class="c wide"><h2>Task board <small id="bf"></small></h2><div id="board" class="board"></div>
+<details><summary>Add task</summary><div class="form"><input id="tn" placeholder="Task name" aria-label="Task name"><select id="tp" aria-label="Project"></select><input id="td" type="number" placeholder="Due week" aria-label="Due week"><select id="tr" aria-label="Priority"><option>High</option><option selected>Medium</option><option>Low</option></select><button id="ta">Add task</button></div></details></section>
+<section class="c"><h2>Materials &amp; safety</h2><ul id="mat" class="mini"></ul><h2>Activity</h2><ul id="act" class="mini"></ul></section>
+<section class="c ai"><h2>Site copilot</h2><div id="chips" class="chips"></div><div id="out" class="out">Pick a question.</div></section>
+</main>
+<div id="toast" class="toast" role="alert" hidden></div>
+<script>// DEMO construction data. Fictional projects. Budget in thousands.
+const CW=12; // current week
+const PROJECTS0=[
+{id:"A",name:"Project A - Riverside Tower",mgr:"R. Mehta",start:2,end:20,budget:6200,spent:3900,prog:48},
+{id:"B",name:"Project B - Metro Depot Shed",mgr:"S. Alvarez",start:5,end:16,budget:2400,spent:1100,prog:42},
+{id:"C",name:"Project C - Harbor Warehouse",mgr:"T. Okoye",start:0,end:14,budget:1500,spent:1380,prog:78},
+{id:"D",name:"Project D - Campus Library Wing",mgr:"L. Chen",start:8,end:24,budget:3100,spent:300,prog:12}];
+const TASKS0=[
+{id:1,p:"A",n:"Pour level 6 slab",st:"Doing",due:11,pri:"High"},{id:2,p:"A",n:"Steel delivery inspection",st:"Todo",due:10,pri:"High"},
+{id:3,p:"A",n:"Install facade anchors",st:"Todo",due:15,pri:"Medium"},{id:4,p:"B",n:"Foundation curing check",st:"Done",due:9,pri:"Medium"},
+{id:5,p:"B",n:"Roof truss assembly",st:"Doing",due:13,pri:"High"},{id:6,p:"C",n:"Electrical fit-out",st:"Doing",due:12,pri:"Medium"},
+{id:7,p:"C",n:"Final safety audit",st:"Todo",due:14,pri:"High"},{id:8,p:"D",n:"Site survey",st:"Done",due:9,pri:"Low"},{id:9,p:"D",n:"Excavation start",st:"Todo",due:11,pri:"Medium"}];
+const MATERIALS=[["Steel rebar","Low stock"],["Concrete mix","OK"],["Bricks","OK"],["Glass panels","Delayed"]];
+</script><script>const $=id=>document.getElementById(id);
+let P=PROJECTS0,T=TASKS0,sel="A";
+try{P=JSON.parse(localStorage.getItem("bt_p")||"null")||PROJECTS0;T=JSON.parse(localStorage.getItem("bt_t")||"null")||TASKS0}catch(e){}
+const save=()=>{try{localStorage.setItem("bt_p",JSON.stringify(P));localStorage.setItem("bt_t",JSON.stringify(T))}catch(e){}};
+function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2000)}
+function act(t,bad){const li=document.createElement("li");if(bad)li.className="bad";li.textContent=`Week ${CW}: ${t}`;$("act").prepend(li);while($("act").children.length>6)$("act").lastChild.remove()}
+const exp=p=>Math.max(0,Math.min(1,(CW-p.start)/(p.end-p.start)))*100;
+const late=p=>T.filter(t=>t.p===p.id&&t.st!=="Done"&&t.due<CW).length;
+const delay=p=>Math.max(0,exp(p)-p.prog);
+const over=p=>Math.max(0,p.spent/p.budget*100-p.prog);
+const rs=p=>Math.round(delay(p)*.6+over(p)*.4+late(p)*5);
+const lvl=p=>{const r=rs(p);return r>=20?"High":r>=8?"Medium":"Low"};
+function kpis(){const act=P.length,hi=P.filter(p=>lvl(p)==="High").length,tb=P.reduce((a,p)=>a+p.budget,0),ts=P.reduce((a,p)=>a+p.spent,0),pr=act?Math.round(P.reduce((a,p)=>a+p.prog,0)/act):0,dl=T.filter(t=>t.st!=="Done"&&t.due<CW).length;
+ $("kpis").innerHTML=[["Active projects",act],["At risk (high)",hi,hi>0],["Overall completion",pr+"%"],["Budget used",tb?Math.round(ts/tb*100)+"%":"0%"],["Delayed tasks",dl,dl>0],["Material alerts",MATERIALS.filter(m=>m[1]!=="OK").length,1]].map(k=>`<div class="k ${k[2]?"bad":""}"><b>${k[1]}</b><span>${k[0]}</span></div>`).join("")}
+function cards(){const q=$("q").value.toLowerCase(),f=$("f").value,s=$("s").value;let l=P.filter(p=>(!f||lvl(p)===f)&&p.name.toLowerCase().includes(q));
+ l.sort(s==="risk"?(a,b)=>rs(b)-rs(a):s==="prog"?(a,b)=>b.prog-a.prog:(a,b)=>a.name.localeCompare(b.name));$("empty").hidden=l.length>0;
+ $("cards").innerHTML=l.map(p=>`<div class="pc ${lvl(p)}" aria-current="${p.id===sel}"><h3>${p.name}</h3><small>${p.mgr}</small> <span class="badge ${lvl(p)}">${lvl(p)} risk</span><div class="bar" title="${p.prog}%"><i style="width:${p.prog}%"></i></div><label>Progress ${p.prog}%<input type="range" min="0" max="100" value="${p.prog}" data-p="${p.id}" aria-label="Update progress for ${p.name}"></label><button data-s="${p.id}">Show tasks</button></div>`).join("")}
+$("cards").oninput=e=>{if(e.target.dataset.p){const p=P.find(x=>x.id===e.target.dataset.p);p.prog=+e.target.value;save();e.target.parentNode.firstChild.textContent="Progress "+p.prog+"%"}};
+$("cards").onchange=e=>{if(e.target.dataset.p){const p=P.find(x=>x.id===e.target.dataset.p);act(`${p.name.split(" - ")[0]} progress set to ${p.prog}%`);toast("Progress updated");refresh()}};
+$("cards").onclick=e=>{if(e.target.dataset.s){sel=e.target.dataset.s;refresh()}};
+["q","f","s"].forEach(i=>$(i).addEventListener("input",cards));
+function matrix(){const c=[[],[],[],[],[],[],[],[],[]];P.forEach(p=>{const L=delay(p)>15?2:delay(p)>5?1:0,I=p.budget>=5000?2:p.budget>=2000?1:0;c[(2-I)*3+L].push(p.id)});
+ $("rm").innerHTML=c.map((a,i)=>`<div class="rc r${Math.min(2,(2-Math.floor(i/3))+(i%3)>=3?2:(2-Math.floor(i/3))+(i%3)>=2?1:0)}">${a.map(x=>`<span>${x}</span>`).join("")}</div>`).join("")+'<small style="grid-column:1/-1">Across: schedule slip. Up: budget impact.</small>'}
+function gantt(){$("gantt").innerHTML=P.map(p=>`<div class="g"><div class="gl">${p.name} <small>wk ${p.start}-${p.end}</small></div><div class="gt"><div class="gb" style="left:${p.start/24*100}%;width:${(p.end-p.start)/24*100}%"><i style="width:${p.prog}%"></i></div><div class="td" style="left:${CW/24*100}%" title="Today"></div></div></div>`).join("")}
+function bud(){$("bud").innerHTML=P.map(p=>{const u=Math.round(p.spent/p.budget*100);return`<div class="brow">${p.id}: ${u}% of $${p.budget}k<div class="bar"><i style="width:${Math.min(100,u)}%;background:${u>p.prog+15?"var(--red)":"var(--ink)"}"></i></div></div>`}).join("")}
+function board(){const l=T.filter(t=>t.p===sel);$("bf").textContent="- "+(P.find(p=>p.id===sel)||{name:"none"}).name;
+ $("board").innerHTML=["Todo","Doing","Done"].map((c,ci)=>`<div class="col"><h3>${c}</h3>${l.filter(t=>t.st===c).map(t=>`<div class="tk ${t.st!=="Done"&&t.due<CW?"over":""}">${t.n}<br><small>${t.pri}, due wk ${t.due}</small><br>${ci>0?`<button data-t="${t.id}" data-d="-1" aria-label="Move ${t.n} back">Back</button>`:""}${ci<2?`<button data-t="${t.id}" data-d="1" aria-label="Move ${t.n} forward">Next</button>`:""}</div>`).join("")||'<small>No tasks</small>'}</div>`).join("")}
+$("board").onclick=e=>{const id=e.target.dataset.t;if(!id)return;const t=T.find(x=>x.id==id),o=["Todo","Doing","Done"];t.st=o[o.indexOf(t.st)+ +e.target.dataset.d];save();act(`"${t.n}" moved to ${t.st}`);toast("Task moved");refresh()};
+$("ta").onclick=()=>{const n=$("tn").value.trim(),d=+$("td").value;if(!n||!d){toast("Enter a task name and due week");return}T.push({id:Date.now(),p:$("tp").value,n,st:"Todo",due:d,pri:$("tr").value});save();act(`Task added: ${n}`);$("tn").value="";toast("Task added");refresh()};
+$("pa").onclick=()=>{const n=$("pn").value.trim(),b=+$("pb").value,s=+$("ps").value,e=+$("pe").value;if(!n||!b||e<=s){toast("Enter name, budget, and an end week after the start");return}const id="N"+P.length;P.push({id,name:n,mgr:"Unassigned",start:s,end:e,budget:b,spent:0,prog:0});sel=id;save();act("Project added: "+n);["pn","pb","ps","pe"].forEach(i=>$(i).value="");toast("Project added");fillSel();refresh()};
+function fillSel(){$("tp").innerHTML="";P.forEach(p=>$("tp").add(new Option(p.name,p.id)))}
+function mat(){$("mat").innerHTML=MATERIALS.map(m=>`<li class="${m[1]==="OK"?"":"bad"}">${m[0]}: ${m[1]}</li>`).join("")}
+function refresh(){kpis();cards();matrix();gantt();bud();board()}
+function ai(k){const r=[...P].sort((a,b)=>rs(b)-rs(a)),w=r[0],p=P.find(x=>x.id===sel)||w;
+ if(k==0)return`${w.name} is at highest risk (score ${rs(w)}): ${Math.round(delay(w))} points behind schedule, ${late(w)} overdue tasks, budget ${Math.round(w.spent/w.budget*100)}% used at ${w.prog}% progress.`;
+ if(k==1)return`${p.name}: expected ${Math.round(exp(p))}% done by week ${CW}, actual ${p.prog}% (${Math.round(delay(p))} behind). ${late(p)} overdue task(s). ${MATERIALS.filter(m=>m[1]!=="OK").map(m=>m[0]+" "+m[1].toLowerCase()).join(", ")} may contribute.`;
+ if(k==2){const o=T.filter(t=>t.st!=="Done").sort((a,b)=>(rs(P.find(x=>x.id===b.p))-rs(P.find(x=>x.id===a.p)))||(a.due-b.due))[0];return o?`Prioritize "${o.n}" (${o.pri}, due week ${o.due}) in ${P.find(x=>x.id===o.p).name}.`:"All tasks are done."}
+ return`${P.length} projects, ${P.filter(x=>lvl(x)==="High").length} high risk, ${Math.round(P.reduce((a,x)=>a+x.prog,0)/P.length)}% average completion, ${T.filter(t=>t.st!=="Done"&&t.due<CW).length} overdue tasks. (Demo data.)`}
+$("chips").innerHTML=["Which project is at risk?","Why is the selected project delayed?","Which task should be prioritized?","Summarize construction progress."].map((x,i)=>`<button data-i="${i}">${x}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.dataset.i)$("out").textContent=ai(+e.target.dataset.i)};
+setTimeout(()=>{if(location.search.includes("error")){$("state").innerHTML='Could not load project data. <button onclick="location.href=location.pathname">Retry</button>';return}
+ $("state").hidden=true;$("main").hidden=false;fillSel();mat();act("Project data loaded");act("Steel rebar stock is low",1);refresh()},700);
+</script></body></html>

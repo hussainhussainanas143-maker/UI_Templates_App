@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MuseAI - Creative Idea Studio</title><style>:root{--bg:#fbf7f0;--ink:#241b2f;--pink:#ff4f8b;--line:#e4dccd}
+*{box-sizing:border-box}html,body{height:100%;margin:0;padding-top:env(safe-area-inset-top,0)}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 "Trebuchet MS","Segoe UI",sans-serif;overflow:hidden}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.load{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:9;font:italic 1.6rem Georgia,serif;transition:opacity .5s}
+.tools{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:12px;z-index:5;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#fff;border:2px solid var(--ink);border-radius:40px;padding:6px 12px;box-shadow:4px 4px 0 var(--ink)}
+.logo{font:700 1.3rem Georgia,serif;color:var(--pink);margin-right:4px}.demo{font-size:.72rem;color:#7a6d85}
+button{font:inherit;cursor:pointer;border:2px solid var(--ink);background:#fff;border-radius:20px;padding:4px 12px}button:hover{background:#ffe3ee}
+#board{position:absolute;inset:0;overflow:auto;background-image:radial-gradient(#d9cfbd 1.3px,transparent 1.3px);background-size:24px 24px;padding-bottom:env(safe-area-inset-bottom,0)}
+.empty{position:absolute;top:40%;left:0;right:360px;text-align:center;font:italic 1.3rem Georgia,serif;color:#9a8da8;padding:0 20px}
+.card{position:absolute;width:190px;min-height:120px;border:2px solid var(--ink);border-radius:6px 18px 6px 18px;box-shadow:4px 4px 0 var(--ink);animation:pop .25s}
+.card .h{display:flex;justify-content:space-between;padding:4px 6px;cursor:grab;touch-action:none;border-bottom:2px dashed rgba(36,27,47,.35)}
+.card .h button{padding:0 7px;font-size:.8rem;border-width:1px}.card .t{padding:8px 10px;min-height:70px;outline:none;white-space:pre-wrap}
+.sw{display:flex;height:46px;margin:6px 10px}.sw i{flex:1}.sec{position:absolute;border:3px dashed #b8a9cc;border-radius:22px;min-width:260px;min-height:180px;resize:both;overflow:hidden}
+.sec .h{cursor:grab;touch-action:none;padding:6px 14px;font:700 1rem Georgia,serif;display:flex;justify-content:space-between}.sec .t{outline:none}
+@keyframes pop{from{transform:scale(.8) rotate(-3deg);opacity:0}}
+.muse{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:340px;max-height:70vh;background:#fff;border:2px solid var(--ink);border-radius:20px;box-shadow:5px 5px 0 var(--pink);padding:12px;display:flex;flex-direction:column;z-index:6}
+.chat{overflow:auto;display:grid;gap:8px;margin-bottom:8px;min-height:60px}.m{padding:8px 12px;border-radius:14px;font-size:.92rem}.m.u{background:var(--ink);color:#fff;justify-self:end}.m.a{background:#f3ecff}
+.m .pin{margin-top:6px;font-size:.8rem;background:var(--pink);color:#fff;border-color:var(--pink)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}.chips button{font-size:.76rem;padding:2px 9px}.ask{display:flex;gap:6px}
+input{flex:1;font:inherit;padding:6px 10px;border:2px solid var(--ink);border-radius:20px;min-width:0}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 18px;border-radius:20px;z-index:10}
+@media(max-width:800px){.muse{width:auto;left:12px;max-height:45vh}.empty{right:0;top:30%}.demo{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<div id="load" class="load">Warming up the studio...</div>
+<nav class="tools" aria-label="Board tools">
+<b class="logo">Muse</b>
+<button id="addCard" title="Add idea card">+ Idea</button>
+<button id="addSec" title="Add section">+ Section</button>
+<button id="clear" title="Clear board">Clear</button>
+<span class="demo">DEMO ideas, generated locally</span></nav>
+<main id="board" aria-label="Creative canvas"><p id="empty" class="empty" hidden>An empty canvas. Add an idea card, or ask Muse for campaign ideas.</p></main>
+<aside class="muse" id="muse"><div id="chat" class="chat" aria-live="polite"></div>
+<div class="chips" id="chips"></div>
+<div class="ask"><input id="ai" placeholder="Ask Muse for ideas..." aria-label="Ask Muse"><button id="send">Go</button></div></aside>
+<div id="toast" class="toast" role="alert" hidden></div>
+<script>// DEMO generators - ideas are templated, not from a live model.
+const COLORS=["#ffd166","#ff8fab","#8ecae6","#b8f2a8","#cdb4ff","#ffb38a"];
+const MOODS={futuristic:["#0b1026","#5eead4","#a78bfa","#f0abfc","#f8fafc"],warm:["#3d1f14","#e76f51","#f4a261","#e9c46a","#fff4e0"],calm:["#16324f","#4d908e","#90be6d","#f9c74f","#f1f7ed"],bold:["#111827","#ef233c","#ffd60a","#00b4d8","#ffffff"]};
+const FONTS=[["Fraunces","Inter","Editorial warmth with a clean workhorse"],["Space Grotesk","IBM Plex Sans","Technical but friendly"],["Playfair Display","Source Sans 3","Classic contrast for premium brands"],["Syne","DM Sans","Expressive headlines for youth brands"]];
+const ANGLES=["Flip the audience: let them make the ad","A 7-day mystery countdown","Street-style posters with a hidden QR","Behind-the-scenes diary series","Before/after reveal reel","Community takeover day","One bold word, one color, everywhere","Collectible sticker drops"];
+const FEST=["Neon Roots: a night where tradition meets glow-in-the-dark art","Echo Fest: every stage reacts to crowd noise","Parallel Campus: swap departments for a day of workshops","Midnight Bazaar: student founders sell, demo and perform"];
+</script><script>const $=id=>document.getElementById(id),board=$("board");
+let S;try{S=JSON.parse(localStorage.getItem("muse")||"null")}catch(e){S=null}
+S=S||{cards:[{id:1,x:60,y:110,t:"Idea: a poster series made only of one bold word",c:COLORS[0]},{id:2,x:300,y:170,t:"Moodboard: neon + paper textures",c:COLORS[1]}],secs:[]};
+const save=()=>{try{localStorage.setItem("muse",JSON.stringify(S))}catch(e){}};
+const uid=()=>Date.now()+Math.random();
+function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2000)}
+function drag(el,h,obj){h.addEventListener("pointerdown",e=>{if(e.target.tagName==="BUTTON")return;h.setPointerCapture(e.pointerId);
+ const dx=e.clientX-obj.x,dy=e.clientY-obj.y;
+ h.onpointermove=m=>{obj.x=Math.max(0,m.clientX-dx);obj.y=Math.max(60,m.clientY-dy);el.style.left=obj.x+"px";el.style.top=obj.y+"px"};
+ h.onpointerup=()=>{h.onpointermove=null;save()}})}
+function render(){board.querySelectorAll(".card,.sec").forEach(n=>n.remove());
+ S.secs.forEach(s=>{const d=document.createElement("div");d.className="sec";d.style.cssText=`left:${s.x}px;top:${s.y}px;width:${s.w}px;height:${s.h}px;background:${s.c}55`;
+  d.innerHTML=`<div class="h"><span class="t" contenteditable="true" aria-label="Section title">${s.t}</span><button aria-label="Delete section">x</button></div>`;
+  d.querySelector(".t").oninput=e=>{s.t=e.target.textContent;save()};d.querySelector("button").onclick=()=>{S.secs=S.secs.filter(x=>x!==s);save();render()};
+  d.onpointerup=()=>{s.w=d.offsetWidth;s.h=d.offsetHeight;save()};drag(d,d.querySelector(".h"),s);board.append(d)});
+ S.cards.forEach(c=>{const d=document.createElement("div");d.className="card";d.style.cssText=`left:${c.x}px;top:${c.y}px;background:${c.c};transform:rotate(${(c.id%5-2)*.8}deg)`;
+  d.innerHTML=`<div class="h"><button aria-label="Change color">color</button><button aria-label="Delete card">x</button></div>`+(c.pal?`<div class="sw">${c.pal.map(p=>`<i style="background:${p}" title="${p}"></i>`).join("")}</div>`:"")+`<div class="t" contenteditable="true" aria-label="Idea text"></div>`;
+  const t=d.querySelector(".t");t.textContent=c.t;t.oninput=()=>{c.t=t.textContent;save()};
+  const [b1,b2]=d.querySelectorAll("button");
+  b1.onclick=()=>{c.c=COLORS[(COLORS.indexOf(c.c)+1)%COLORS.length];save();render()};
+  b2.onclick=()=>{S.cards=S.cards.filter(x=>x!==c);save();render();toast("Card deleted")};
+  drag(d,d.querySelector(".h"),c);board.append(d)});
+ $("empty").hidden=S.cards.length+S.secs.length>0}
+function pin(t,pal){S.cards.push({id:uid(),x:80+Math.random()*300,y:120+Math.random()*250,t,c:COLORS[S.cards.length%6],pal});save();render();toast("Pinned to board")}
+$("addCard").onclick=()=>pin("New idea - type here");
+$("addSec").onclick=()=>{S.secs.push({id:uid(),x:40+S.secs.length*30,y:100+S.secs.length*30,w:360,h:260,t:"New section",c:COLORS[S.secs.length%6]});save();render();toast("Section added")};
+$("clear").onclick=()=>{if(confirm("Clear the whole board?")){S.cards=[];S.secs=[];save();render()}};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function reply(q){q=q.toLowerCase();const last=S.cards[S.cards.length-1];
+ if(/campaign/.test(q)){const l=[...ANGLES].sort(()=>Math.random()-.5).slice(0,5);return{t:"5 campaign ideas:\n"+l.map((x,i)=>(i+1)+". "+x).join("\n"),pin:l.join("\n")}}
+ if(/palette|color/.test(q)){const k=Object.keys(MOODS).find(m=>q.includes(m))||"futuristic",p=MOODS[k];return{t:`A ${k} palette: ${p.join(", ")}`,pin:k+" palette",pal:p}}
+ if(/festival/.test(q)){const f=pick(FEST);return{t:"Festival concept: "+f,pin:f}}
+ if(/brief/.test(q)){const s=last?last.t:"your idea";const b=`Creative brief\nIdea: ${s}\nGoal: spark curiosity and sign-ups\nAudience: students, 18-24\nTone: playful, confident\nDeliverables: poster, reel, landing page`;return{t:b,pin:b}}
+ if(/typo|font/.test(q)){const f=pick(FONTS);return{t:`Pair ${f[0]} (headlines) with ${f[1]} (body): ${f[2]}.`,pin:`Type: ${f[0]} + ${f[1]}`}}
+ return{t:"Try: campaign ideas, a futuristic palette, a college festival concept, a brief from your latest idea, or typography."}}
+function say(t,c,r){const d=document.createElement("div");d.className="m "+c;d.textContent=t;
+ if(r&&r.pin){const b=document.createElement("button");b.className="pin";b.textContent="Pin to board";b.onclick=()=>pin(r.pin,r.pal);d.append(document.createElement("br"),b)}
+ $("chat").append(d);$("chat").scrollTop=1e9}
+function ask(q){if(!q.trim())return;say(q,"u");setTimeout(()=>{const r=reply(q);say(r.t,"a",r)},300);$("ai").value=""}
+$("send").onclick=()=>ask($("ai").value);$("ai").onkeydown=e=>{if(e.key==="Enter")ask($("ai").value)};
+$("chips").innerHTML=["Give me 5 campaign ideas","Create a futuristic color palette","Generate a college festival concept","Turn this idea into a creative brief","Suggest typography combinations"].map(x=>`<button>${x}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};
+render();say("Hi, I'm Muse. Drag cards, edit text, or ask me for ideas.","a");
+setTimeout(()=>{$("load").style.opacity=0;setTimeout(()=>$("load").remove(),500)},600);
+</script></body></html>
