@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CareerPilot</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f3ff;--card:#fff;--ink:#241a45;--mut:#6b6290;--line:#e4defa;--acc:#7c3aed;--ok:#059669;--warn:#d97706;--bad:#dc2626}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#120d24;--card:#1b1433;--ink:#efeaff;--mut:#a79fd0;--line:#2f2556;--acc:#a78bfa;--ok:#34d399;--warn:#fbbf24;--bad:#fb7185}}
+:root[data-theme="dark"]{--bg:#120d24;--card:#1b1433;--ink:#efeaff;--mut:#a79fd0;--line:#2f2556;--acc:#a78bfa;--ok:#34d399;--warn:#fbbf24;--bad:#fb7185}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+button,input,select{font:inherit;color:var(--ink)}:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+.b,input,select{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 11px}.b{cursor:pointer;transition:.15s}.b:hover{border-color:var(--acc)}.b.p{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600}
+header{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;max-width:1150px;margin:auto;padding:14px 20px}
+h1{margin:0;font-size:24px}h1 i{color:var(--acc);font-style:normal}
+.tabs{display:flex;gap:6px;max-width:1150px;margin:0 auto;padding:0 20px;overflow-x:auto}.tabs button{border-radius:99px;white-space:nowrap}.tabs button[aria-selected=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+main{max-width:1150px;margin:auto;padding:14px 20px 40px;display:grid;gap:14px}
+.pg[hidden]{display:none}.pg{display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.kpi small{color:var(--mut)}.kpi b{display:block;font-size:26px}
+h2{margin:0 0 8px;font-size:15px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.g3{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.form label{font-size:13px;color:var(--mut);display:grid;gap:3px}
+.sk{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}.sk label{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg);padding:6px 10px;border-radius:10px;font-size:14px}.sk select{padding:3px 6px}
+.bar{height:8px;border-radius:9px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--acc);transition:width .4s}
+.item{display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:10px;background:var(--bg);margin-bottom:6px}.item div{flex:1}
+.item.done{opacity:.5}.tag{font-size:11px;padding:1px 8px;border-radius:99px;background:var(--line);margin-right:4px}
+table{width:100%;border-collapse:collapse;min-width:520px}th,td{padding:6px;text-align:left;border-bottom:1px solid var(--line)}th{color:var(--mut);font-size:13px}.scroll{overflow-x:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.chips button{border-radius:99px;font-size:13px}
+#log{max-height:300px;overflow:auto;display:grid;gap:8px}
+.q{justify-self:end;background:var(--acc);color:#fff;padding:6px 12px;border-radius:12px}
+.a{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;margin:0;font-size:14px}.a dt{font-weight:700;color:var(--acc);font-size:12px;text-transform:uppercase;margin-top:6px}.a dd{margin:0}
+.dots span{display:inline-block;width:7px;height:7px;margin:2px;border-radius:50%;background:var(--acc);animation:b 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}.empty{color:var(--mut);text-align:center;padding:12px}.note{font-size:12px;color:var(--mut)}.err{color:var(--bad);font-size:13px}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s}#toast.on{opacity:1}
+@media(max-width:860px){.g2,.g3{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Career<i>Pilot</i> <span class="note">· illustrative demo data, not hiring advice</span></h1><div class="row"><button class="b" id="theme" aria-label="Toggle theme">Theme</button><button class="b" id="reset">Reset</button></div></header>
+<div class="tabs" role="tablist" id="tabs"></div>
+<main>
+<section class="pg" id="pg-profile" aria-label="Profile">
+<div class="card"><h2>1 · About you</h2><div class="form"><label>Degree<input id="deg"></label><label>Experience (months)<input id="exp" type="number" min="0" max="240"></label><label>Interests<input id="int"></label><label>Target role<select id="role"></select></label><label>Target salary (₹ LPA)<input id="sal" type="number" min="3" max="100"></label></div><p class="err" id="perr" role="alert" hidden></p></div>
+<div class="card"><h2>2 · Rate your skills (0 none – 5 expert)</h2><div class="sk" id="sk"></div></div>
+<div class="card"><h2>3 · Projects</h2><div id="pj"></div><div class="row" style="margin-top:8px"><input id="pn" aria-label="Project name" placeholder="Add a project you built"><button class="b p" id="pa">Add</button></div></div>
+</section>
+<section class="pg" id="pg-overview" hidden aria-label="Overview"><div class="kpis" id="kpis"></div>
+<div class="g3"><div class="card"><h2>Skill graph · click a skill to raise your level</h2><div id="graph"></div></div><div class="card"><h2>Skill gap analysis</h2><div id="gap"></div></div></div>
+<div class="card"><h2>Ask CareerPilot AI</h2><div class="chips" id="chips"></div><div id="log" aria-live="polite"><p class="empty">Ask about gaps, roadmap or your next project.</p></div><form class="row" id="f" style="margin-top:8px"><input id="qi" aria-label="Ask a question" placeholder="What skills am I missing for an AI Engineer?"><button class="b p">Ask</button></form></div></section>
+<section class="pg" id="pg-plan" hidden aria-label="Roadmap"><div class="g2"><div class="card"><h2>6-month roadmap</h2><label class="note">Study hours per week <input id="hrs" type="number" min="2" max="60" style="width:70px"></label><div id="road" style="margin-top:8px"></div></div><div class="card"><h2>Recommended projects</h2><div id="rp"></div></div></div>
+<div class="g2"><div class="card"><h2>Resume checklist</h2><div id="rc"></div></div><div class="card"><h2>Interview preparation</h2><div id="iv"></div></div></div></section>
+<section class="pg" id="pg-compare" hidden aria-label="Compare roles"><div class="card"><h2>Role comparison</h2><div class="scroll"><table><thead><tr><th>Role</th><th>Readiness</th><th>Missing skills</th><th>Illustrative salary</th><th></th></tr></thead><tbody id="cmp"></tbody></table></div></div></section>
+</main><div id="toast" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);
+const SK=["Python","SQL","Statistics","Machine Learning","Deep Learning","LLMs & NLP","MLOps","Cloud (AWS/Azure)","Docker","Data Pipelines","JavaScript","React","Backend APIs","System Design","Product Thinking","Git"];
+const ROLES={"AI Engineer":{s:{Python:4,"Machine Learning":3,"Deep Learning":3,"LLMs & NLP":4,"Backend APIs":3,Docker:3,"Cloud (AWS/Azure)":3,Git:3},lpa:18},"ML Engineer":{s:{Python:4,"Machine Learning":4,MLOps:4,Docker:3,"Cloud (AWS/Azure)":3,SQL:3,Statistics:3,Git:3},lpa:17},"Data Scientist":{s:{Python:4,SQL:4,Statistics:4,"Machine Learning":3,"Product Thinking":2,Git:2},lpa:15},"Full Stack Developer":{s:{JavaScript:4,React:4,"Backend APIs":4,SQL:3,Git:3,Docker:2,"System Design":2},lpa:12},"AI Product Engineer":{s:{Python:3,"LLMs & NLP":3,"Backend APIs":3,React:3,"Product Thinking":4,"System Design":3,Git:3},lpa:20},"Data Engineer":{s:{Python:4,SQL:4,"Data Pipelines":4,"Cloud (AWS/Azure)":3,Docker:3,"System Design":3,Git:3},lpa:14}};
+const PROJ=[["RAG chatbot for university FAQs",["LLMs & NLP","Backend APIs","Python"]],["End-to-end ML pipeline with CI/CD",["MLOps","Docker","Machine Learning"]],["Deploy a model on cloud with an API",["Cloud (AWS/Azure)","Docker","Backend APIs"]],["Real-time dashboard on streaming data",["Data Pipelines","SQL","React"]],["Image classifier with a web front end",["Deep Learning","JavaScript","Python"]],["Statistical A/B testing toolkit",["Statistics","Python","SQL"]],["Scalable URL shortener design doc + build",["System Design","Backend APIs","Git"]],["Product analytics assistant",["Product Thinking","LLMs & NLP","SQL"]]];
+const RES=["GitHub profile linked with pinned projects","Each project has a measurable result","Skills section matches the target role","LinkedIn headline states the target role","One-page layout, no spelling errors","Certification or course listed"];
+const SEED={deg:"B.Tech Computer Science, Sai University",exp:6,int:"NLP, healthcare AI",role:"AI Engineer",sal:18,hrs:10,lv:{Python:4,SQL:3,Statistics:3,"Machine Learning":3,Git:3,"Backend APIs":2,JavaScript:2},pj:[{n:"Sentiment classifier for Tamil tweets",d:true},{n:"Expense tracker web app",d:true}],ck:{},rs:{},iv:{}};
+let S;const load=()=>{try{S=JSON.parse(localStorage.getItem("careerpilot"))||structuredClone(SEED)}catch(e){S=structuredClone(SEED)}};const save=()=>{try{localStorage.setItem("careerpilot",JSON.stringify(S))}catch(e){}};
+const toast=m=>{const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove("on"),2000)};
+const lv=s=>S.lv[s]||0,sum=a=>a.reduce((x,y)=>x+y,0);
+const ready=r=>{const q=ROLES[r].s,t=sum(Object.values(q));return Math.round(sum(Object.entries(q).map(([k,v])=>Math.min(lv(k),v)))/t*100)};
+const gaps=r=>Object.entries(ROLES[r].s).filter(([k,v])=>lv(k)<v).map(([k,v])=>({k,g:v-lv(k),need:v})).sort((a,b)=>b.g-a.g);
+const done=()=>S.pj.filter(p=>p.d).length;
+const stats=()=>{const r=ready(S.role),sk=Math.min(100,Math.round(sum(SK.map(lv))/(5*9)*100)),iv=Math.round(r*.5+Math.min(done(),4)/4*30+Math.min(S.exp,24)/24*20);return{r,sk,iv}};
+const TABS=[["profile","Profile"],["overview","Overview"],["plan","Roadmap & Prep"],["compare","Compare roles"]];let tab="profile";
+function show(t){tab=t;TABS.forEach(x=>$("pg-"+x[0]).hidden=x[0]!==t);$("tabs").innerHTML=TABS.map(x=>`<button class="b" role="tab" aria-selected="${x[0]===t}" data-t="${x[0]}">${x[1]}</button>`).join("");render()}
+function profile(){$("deg").value=S.deg;$("exp").value=S.exp;$("int").value=S.int;$("role").value=S.role;$("sal").value=S.sal;
+$("sk").innerHTML=SK.map(s=>`<label>${s}<select data-s="${s}" aria-label="${s} level">${[0,1,2,3,4,5].map(n=>`<option${lv(s)===n?" selected":""}>${n}</option>`).join("")}</select></label>`).join("");
+$("pj").innerHTML=S.pj.length?S.pj.map((p,i)=>`<div class="item ${p.d?"done":""}"><input type="checkbox" ${p.d?"checked":""} data-pc="${i}" aria-label="Completed ${p.n}"><div>${p.n}</div><button class="b" data-pd="${i}" aria-label="Delete ${p.n}">✕</button></div>`).join(""):'<p class="empty">No projects yet. Add your first one.</p>'}
+function overview(){const s=stats(),g=gaps(S.role),c=s.r>=75?"var(--ok)":s.r>=50?"var(--warn)":"var(--bad)";
+$("kpis").innerHTML=[["Skill score",s.sk+"/100"],["Job readiness",s.r+"%"],["Missing skills",g.length],["Projects completed",done()],["Interview readiness",s.iv+"%"]].map(k=>`<div class="card kpi"><small>${k[0]}</small><b>${k[1]}</b></div>`).join("");
+const q=Object.entries(ROLES[S.role].s),n=q.length,P=q.map((_,i)=>[200+130*Math.cos(i/n*6.283-1.57),135+100*Math.sin(i/n*6.283-1.57)]);
+$("graph").innerHTML=`<svg viewBox="0 0 400 270" width="100%"><title>Skill graph for ${S.role}</title>`+q.map(([k,v],i)=>`<line x1="200" y1="135" x2="${P[i][0]}" y2="${P[i][1]}" stroke="var(--mut)" stroke-width="${v/2}" opacity=".4"/>`).join("")+`<circle cx="200" cy="135" r="30" fill="var(--acc)"/><text x="200" y="139" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">${S.role.split(" ")[0]}</text>`+q.map(([k,v],i)=>{const r=Math.min(1,lv(k)/v),f=r>=1?"var(--ok)":r>=.5?"var(--warn)":"var(--bad)";return`<g tabindex="0" role="button" aria-label="${k}: level ${lv(k)} of ${v} needed. Activate to raise" data-k="${k}" style="cursor:pointer"><circle cx="${P[i][0]}" cy="${P[i][1]}" r="15" fill="${f}"/><text x="${P[i][0]}" y="${P[i][1]+4}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">${lv(k)}/${v}</text><text x="${P[i][0]}" y="${P[i][1]+(P[i][1]>135?30:-21)}" text-anchor="middle" font-size="10" fill="var(--ink)">${k}</text></g>`}).join("")+`</svg><p class="note">Green = meets requirement, amber = halfway, red = gap. Numbers are your level / required level.</p>`;
+$("gap").innerHTML=(g.length?g.map(x=>`<div style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><b>${x.k}</b><span class="note">level ${lv(x.k)} → ${x.need}</span></div><div class="bar"><i style="width:${lv(x.k)/x.need*100}%"></i></div></div>`).join(""):'<p class="empty">No gaps. You meet every requirement for this role.</p>')+`<p class="note">Target ₹${S.sal} LPA vs illustrative market ₹${ROLES[S.role].lpa} LPA: ${S.sal>ROLES[S.role].lpa*1.2?"above typical range, so aim for senior-level skills":"within a realistic range"}.</p>`}
+function plan(){const g=gaps(S.role);$("hrs").value=S.hrs;
+$("road").innerHTML=g.length?[...Array(6)].map((_,m)=>{const sl=g.slice(m*Math.ceil(g.length/6),(m+1)*Math.ceil(g.length/6));if(!sl.length)return"";const wk=Math.max(1,Math.round(sum(sl.map(x=>x.g))*20/S.hrs));return`<div class="item ${S.ck["m"+m]?"done":""}"><input type="checkbox" ${S.ck["m"+m]?"checked":""} data-m="${m}" aria-label="Month ${m+1} done"><div><b>Month ${m+1}</b>: ${sl.map(x=>x.k).join(", ")}<br><span class="note">~${wk} weeks at ${S.hrs} h/week · reach ${sl.map(x=>x.need).join("/")} level</span></div></div>`}).join(""):'<p class="empty">No gaps to plan. Consider a stretch role.</p>';
+const gm=Object.fromEntries(g.map(x=>[x.k,x.g])),pr=PROJ.map(p=>({n:p[0],s:p[1],sc:sum(p[1].map(k=>gm[k]||0))})).sort((a,b)=>b.sc-a.sc).slice(0,3);
+$("rp").innerHTML=pr.map(p=>`<div class="item"><div><b>${p.n}</b><br>${p.s.map(k=>`<span class="tag">${k}</span>`).join("")}</div><button class="b" data-ap="${p.n}">Start</button></div>`).join("");
+$("rc").innerHTML=RES.map((r,i)=>`<label class="item ${S.rs[i]?"done":""}"><input type="checkbox" ${S.rs[i]?"checked":""} data-r="${i}"><div>${r}</div></label>`).join("");
+const qs=g.slice(0,4).map(x=>`Explain how you would apply ${x.k} in a real project.`).concat(["Walk me through a project you are proud of.","Tell me about a bug you debugged."]);
+$("iv").innerHTML=qs.map((x,i)=>`<label class="item ${S.iv[i]?"done":""}"><input type="checkbox" ${S.iv[i]?"checked":""} data-i="${i}"><div>${x}</div></label>`).join("")}
+function compare(){$("cmp").innerHTML=Object.keys(ROLES).map(r=>({r,p:ready(r),g:gaps(r)})).sort((a,b)=>b.p-a.p).map(x=>`<tr><td><b>${x.r}</b></td><td style="min-width:130px"><div class="bar"><i style="width:${x.p}%"></i></div>${x.p}%</td><td>${x.g.length?x.g.slice(0,3).map(k=>k.k).join(", ")+(x.g.length>3?" +"+(x.g.length-3):""):"None"}</td><td>₹${ROLES[x.r].lpa} LPA</td><td><button class="b" data-pick="${x.r}">Target this</button></td></tr>`).join("")}
+function render(){if(tab==="profile")profile();if(tab==="overview")overview();if(tab==="plan")plan();if(tab==="compare")compare()}
+function answer(q){q=q.toLowerCase();let r=Object.keys(ROLES).find(x=>q.includes(x.toLowerCase()))||S.role;const g=gaps(r),rd=ready(r);
+if(/missing|skill gap|gap|analy/.test(q))return g.length?{r:`For ${r} you are ${rd}% ready; ${g.length} skill(s) are below requirement.`,e:g.slice(0,4).map(x=>`${x.k} ${lv(x.k)}/${x.need}`).join(", "),rec:`Start with ${g[0].k}, the largest gap (${g[0].g} levels).`,c:88}:{r:`You meet every ${r} requirement.`,e:`Readiness ${rd}%.`,rec:"Apply now and deepen system design.",c:80};
+if(/roadmap|month|plan/.test(q)){const o=g.slice(0,6);return{r:`A 6-month plan for ${r} covers ${o.length} skill(s).`,e:o.map((x,i)=>`M${i+1}: ${x.k}`).join("; ")||"No gaps.",rec:`Study ${S.hrs} h/week and ship one project per two months. See the Roadmap tab.`,c:78}}
+if(/project|build/.test(q)){const gm=Object.fromEntries(g.map(x=>[x.k,x.g])),p=PROJ.map(p=>({n:p[0],sc:sum(p[1].map(k=>gm[k]||0)),s:p[1]})).sort((a,b)=>b.sc-a.sc)[0];return{r:`Build "${p.n}" next.`,e:`Covers ${p.s.filter(k=>gm[k]).join(", ")||"your stretch skills"} for ${r}.`,rec:"Add it under Profile > Projects and show a measurable result on your resume.",c:80}}
+return{r:"I can analyse gaps, draft a roadmap or pick your next project.",e:"Try a suggested prompt.",rec:"Rephrase around one of those.",c:30}}
+function ask(q){if(!q.trim())return toast("Type a question");const l=$("log");if(l.querySelector(".empty"))l.innerHTML="";l.insertAdjacentHTML("beforeend",'<div class="q"></div>');l.lastChild.textContent=q;l.insertAdjacentHTML("beforeend",'<div class="a dots" id="ld"><span></span><span></span><span></span></div>');l.scrollTop=1e9;
+setTimeout(()=>{const a=answer(q);$("ld").remove();l.insertAdjacentHTML("beforeend",`<dl class="a"><dt>Reason</dt><dd>${a.r}</dd><dt>Evidence</dt><dd>${a.e}</dd><dt>Recommendation</dt><dd>${a.rec}</dd><dt>Confidence</dt><dd>${a.c}%</dd></dl>`);l.scrollTop=1e9},600)}
+$("tabs").onclick=e=>{const b=e.target.closest("button");if(b)show(b.dataset.t)};
+$("role").innerHTML=Object.keys(ROLES).map(r=>`<option>${r}</option>`).join("");
+function prof(){const e=$("perr"),x=+$("exp").value,s=+$("sal").value;if(!(x>=0&&x<=240)||!(s>=3&&s<=100)){e.hidden=false;e.textContent="Experience must be 0–240 months and salary 3–100 LPA.";return}e.hidden=true;S.deg=$("deg").value;S.exp=x;S.int=$("int").value;S.role=$("role").value;S.sal=s;save()}
+["deg","exp","int","role","sal"].forEach(i=>$(i).addEventListener("change",()=>{prof();toast("Profile updated")}));
+$("sk").onchange=e=>{const s=e.target.dataset.s;if(s){S.lv[s]=+e.target.value;save();toast(s+" set to "+e.target.value)}};
+$("pa").onclick=()=>{const n=$("pn").value.trim();if(!n)return toast("Enter a project name");S.pj.push({n,d:false});$("pn").value="";save();profile();toast("Project added")};
+$("pj").onchange=e=>{const i=e.target.dataset.pc;if(i!=null){S.pj[i].d=e.target.checked;save();profile()}};$("pj").onclick=e=>{const i=e.target.dataset.pd;if(i!=null){S.pj.splice(i,1);save();profile()}};
+const pk=e=>{const g=e.target.closest("g[data-k]");if(g){S.lv[g.dataset.k]=Math.min(5,lv(g.dataset.k)+1);save();overview();toast(g.dataset.k+" → level "+lv(g.dataset.k))}};$("graph").onclick=pk;$("graph").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pk(e)}};
+$("pg-plan").onchange=e=>{const t=e.target;if(t.id==="hrs"){const v=+t.value;if(!(v>=2&&v<=60)){t.value=S.hrs;return toast("Hours must be 2–60")}S.hrs=v}else if(t.dataset.m!=null)S.ck["m"+t.dataset.m]=t.checked;else if(t.dataset.r!=null)S.rs[t.dataset.r]=t.checked;else if(t.dataset.i!=null)S.iv[t.dataset.i]=t.checked;save();plan()};
+$("pg-plan").onclick=e=>{const n=e.target.dataset.ap;if(n){S.pj.push({n,d:false});save();toast("Added to your projects");plan()}};
+$("cmp").onclick=e=>{const r=e.target.dataset.pick;if(r){S.role=r;S.sal=ROLES[r].lpa;save();compare();toast("Target role: "+r)}};
+$("chips").innerHTML=["What skills am I missing for an AI Engineer?","Create a 6-month roadmap.","Which project should I build next?","Analyze my skill gap."].map(c=>`<button class="b" type="button">${c}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};$("f").onsubmit=e=>{e.preventDefault();ask($("qi").value);$("qi").value=""};
+$("theme").onclick=()=>{const d=document.documentElement,n=(d.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark"?"light":"dark";d.dataset.theme=n;try{localStorage.setItem("cp8-theme",n)}catch(e){}};
+$("reset").onclick=()=>{S=structuredClone(SEED);save();render();toast("Demo profile reset")};
+try{const t=localStorage.getItem("cp8-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+load();show("overview");
+</script></body></html>

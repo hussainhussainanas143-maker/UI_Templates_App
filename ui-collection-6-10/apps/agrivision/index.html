@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AgriVision</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f1f4e8;--card:#fbfcf6;--ink:#1f2d1a;--mut:#60705a;--line:#dde4cc;--acc:#3f7d20;--c2:#0e7490;--warn:#b45309;--bad:#b91c1c}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f160c;--card:#172011;--ink:#e9f2de;--mut:#a3b596;--line:#2a381f;--acc:#84cc16;--c2:#22d3ee;--warn:#fbbf24;--bad:#f87171}}
+:root[data-theme="dark"]{--bg:#0f160c;--card:#172011;--ink:#e9f2de;--mut:#a3b596;--line:#2a381f;--acc:#84cc16;--c2:#22d3ee;--warn:#fbbf24;--bad:#f87171}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+button,input,select{font:inherit;color:var(--ink)}:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+.b,input,select{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 11px}.b{cursor:pointer;transition:.15s}.b:hover{border-color:var(--acc)}.b.p{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600}
+header{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;max-width:1200px;margin:auto;padding:14px 20px}
+h1{margin:0;font-size:24px}h1 i{color:var(--acc);font-style:normal}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.live{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--mut)}.led{width:9px;height:9px;border-radius:50%;background:var(--acc);animation:p 1.4s infinite}.paused .led{background:var(--warn);animation:none}@keyframes p{50%{opacity:.3}}
+main{max-width:1200px;margin:auto;padding:0 20px 40px;display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.kpi small{color:var(--mut)}.kpi b{display:block;font-size:24px}
+h2{margin:0 0 8px;font-size:15px}.g{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.fc{text-align:left;background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:12px;cursor:pointer}.fc[aria-pressed=true]{border-color:var(--acc)}.fc small{color:var(--mut)}
+.mbar{height:8px;border-radius:9px;background:var(--line);position:relative;margin:6px 0}.mbar i{display:block;height:100%;border-radius:9px;background:var(--c2)}.mbar u{position:absolute;top:-2px;height:12px;border-left:2px solid var(--acc);border-right:2px solid var(--acc)}
+.tabs{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}.tabs button[aria-selected=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.al{display:flex;gap:8px;padding:8px;border-radius:10px;background:var(--bg);margin-bottom:6px;border-left:4px solid var(--warn)}.al.hi{border-color:var(--bad)}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.chips button{border-radius:99px;font-size:13px}
+#log{max-height:290px;overflow:auto;display:grid;gap:8px}
+.q{justify-self:end;background:var(--acc);color:#fff;padding:6px 12px;border-radius:12px}
+.a{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;margin:0;font-size:14px}.a dt{font-weight:700;color:var(--acc);font-size:12px;text-transform:uppercase;margin-top:6px}.a dd{margin:0}
+.dots span{display:inline-block;width:7px;height:7px;margin:2px;border-radius:50%;background:var(--acc);animation:b 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}.empty{color:var(--mut);text-align:center;padding:12px}.note{font-size:12px;color:var(--mut)}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s}#toast.on{opacity:1}
+@media(max-width:860px){.g,.g2{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Agri<i>Vision</i> <span class="note">· simulated sensor data</span></h1>
+<div class="bar"><label>Farm <select id="farm"></select></label><label>Crop <select id="crop"></select></label><span class="live" id="live"><span class="led"></span><span id="clk"></span></span><button class="b" id="pause">Pause</button><button class="b" id="theme" aria-label="Toggle theme">Theme</button></div></header>
+<main>
+<div class="kpis" id="kpis" aria-label="Farm metrics"></div>
+<div class="card"><h2>Fields · select one for details</h2><div class="fields" id="fields"></div></div>
+<div class="g">
+<div class="card"><h2 id="ft"></h2><div class="tabs" id="tabs" role="tablist"></div><div id="chart" role="img" aria-label="Historical chart for the selected field"></div>
+<h2 style="margin-top:12px">Crop health map</h2><div id="heat" role="img" aria-label="Crop health heat map"></div></div>
+<div class="card"><h2>Irrigation controls</h2><div id="ctl"></div><h2 style="margin-top:12px">Alerts</h2><div id="alerts"></div></div></div>
+<div class="card"><h2>Ask AgriVision AI</h2><div class="chips" id="chips"></div><div id="log" aria-live="polite"><p class="empty">Ask about irrigation, crop health or water needs.</p></div><form class="row" id="f" style="margin-top:8px"><input id="qi" aria-label="Ask a question" placeholder="Does this field need irrigation?"><button class="b p">Ask</button></form></div>
+</main><div id="toast" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);
+const CROP={Paddy:{lo:55,hi:80,w:60},Sugarcane:{lo:50,hi:75,w:50},Tomato:{lo:45,hi:65,w:35},Banana:{lo:55,hi:75,w:45},Groundnut:{lo:35,hi:55,w:25},Grapes:{lo:35,hi:55,w:30}};
+const mkH=(b,v,s)=>{let x=b,g=s;return[...Array(14)].map((_,i)=>{g=g*16807%2147483647;return +(x+=(g%100/100-.5)*v).toFixed(1)})};
+const FARMS={"Thanjavur Delta Farm":{rain:35,f:[["Field A1","Paddy",4.2,62,31,74,88,64],["Field A2","Sugarcane",3.1,41,34,60,66,45],["Field A3","Groundnut",2.4,44,33,58,82,70]]},"Coimbatore Orchard":{rain:20,f:[["Block B1","Banana",2.8,58,30,70,90,55],["Block B2","Tomato",1.6,36,36,52,58,38],["Block B3","Grapes",2.2,47,32,56,84,60]]}};
+function init(){const D={};Object.entries(FARMS).forEach(([n,fm],k)=>{D[n]={rain:fm.rain,heat:0,f:fm.f.map((x,i)=>({id:k*10+i,n:x[0],c:x[1],ha:x[2],m:x[3],t:x[4],h:x[5],hl:x[6],gr:x[7],on:false,auto:i!==1,wu:0,hm:mkH(x[3]+4,6,k*7+i+3),hh:mkH(x[6]+4,5,k*5+i+9)}))}});return D}
+let D=init(),farm="Thanjavur Delta Farm",crop="All",sel=null,tab="m",paused=false,tick=0,timer;
+const toast=m=>{const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove("on"),2000)};
+const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a),sum=a=>a.reduce((x,y)=>x+y,0);
+const fs=()=>D[farm].f.filter(f=>crop==="All"||f.c===crop),cur=()=>{const l=fs();return l.find(f=>f.id===sel)||l[0]};
+function step(){tick++;const fm=D[farm];fm.rain=clamp(fm.rain+rnd(-6,6));Object.values(D).forEach(F=>F.f.forEach(f=>{const r=CROP[f.c];f.t=+clamp(f.t+rnd(-.4,.4),24,42).toFixed(1);f.h=clamp(f.h+rnd(-1.5,1.5),30,95);
+f.m=clamp(f.m-.35-(f.t-28)*.04+(f.on?2.6:0)+(F.rain>75&&Math.random()<.2?4:0));if(f.on)f.wu+=f.ha*18;
+if(f.auto){if(f.m<r.lo&&!f.on&&F.rain<70)f.on=true;if(f.m>r.hi-4&&f.on)f.on=false}
+const stress=f.m<r.lo-5||f.m>r.hi+8||f.t>36;f.hl=clamp(f.hl+(stress?-.5:.3));f.gr=clamp(f.gr+.04,0,100);f.hm[13]=+f.m.toFixed(1);f.hh[13]=+f.hl.toFixed(1)}));render()}
+const alerts=f=>{const r=CROP[f.c],a=[];if(f.m<r.lo-5)a.push(["hi",`${f.n}: soil critically dry (${f.m.toFixed(0)}%)`]);else if(f.m<r.lo)a.push(["",`${f.n}: moisture below ${r.lo}%`]);if(f.m>r.hi+8)a.push(["hi",`${f.n}: waterlogging risk (${f.m.toFixed(0)}%)`]);if(f.hl<60)a.push(["hi",`${f.n}: crop health low (${f.hl.toFixed(0)}%)`]);if(f.t>36)a.push(["",`${f.n}: heat stress, ${f.t}°C`]);return a};
+function render(){const l=fs(),F=D[farm];$("clk").textContent=(paused?"PAUSED":"LIVE")+" · tick "+tick;$("live").className="live"+(paused?" paused":"");
+if(!l.length){["kpis","fields","chart","heat","ctl","alerts"].forEach(i=>$(i).innerHTML="");$("fields").innerHTML='<p class="empty">No fields grow this crop on this farm. Choose another crop.</p>';return}
+const f=cur(),avg=k=>sum(l.map(x=>x[k]))/l.length,hs=Math.round(avg("hl")),risk=F.rain>70?"Heavy rain likely":avg("t")>35?"Heat stress":"Low";
+$("kpis").innerHTML=[["Farm health",hs+"/100"],["Soil moisture",avg("m").toFixed(0)+"%"],["Water used today",(sum(l.map(x=>x.wu))/1000).toFixed(1)+" kL"],["Crop health",hs>=75?"Good":hs>=60?"Watch":"Poor"],["Weather risk",risk+" ("+Math.round(F.rain)+"% rain)"],["Irrigation",l.filter(x=>x.on).length+"/"+l.length+" running"]].map((k,i)=>`<div class="card kpi"><small>${k[0]}</small><b style="font-size:${k[1].length>14?15:24}px">${k[1]}</b></div>`).join("");
+$("fields").innerHTML=l.map(x=>{const r=CROP[x.c];return`<button class="fc" data-id="${x.id}" aria-pressed="${x.id===f.id}"><b>${x.n}</b> · ${x.c} <small>${x.ha} ha</small><div class="mbar"><i style="width:${x.m}%"></i><u style="left:${r.lo}%;width:${r.hi-r.lo}%"></u></div><small>Moisture ${x.m.toFixed(0)}% (ideal ${r.lo}–${r.hi}) · ${x.t}°C · health ${x.hl.toFixed(0)}% · ${x.on?"💧 irrigating":"idle"}</small></button>`}).join("");
+$("ft").textContent=f.n+" · "+f.c+" · growth "+f.gr.toFixed(0)+"% of cycle";
+$("tabs").innerHTML=[["m","Soil moisture"],["h","Crop health"]].map(x=>`<button class="b" role="tab" aria-selected="${tab===x[0]}" data-t="${x[0]}">${x[1]}</button>`).join("");
+const v=tab==="m"?f.hm:f.hh,r=CROP[f.c],W=500,pts=v.map((y,i)=>[10+i*(W-20)/13,150-clamp(y)*1.4]);
+$("chart").innerHTML=`<svg viewBox="0 0 ${W} 170" width="100%"><title>${tab==="m"?"Moisture":"Health"} over 14 days</title>`+(tab==="m"?`<rect x="0" y="${150-r.hi*1.4}" width="${W}" height="${(r.hi-r.lo)*1.4}" fill="var(--acc)" opacity=".15"/>`:"")+`<path d="${pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join("")}" fill="none" stroke="var(--c2)" stroke-width="2.5"/>`+pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="var(--c2)"/>`).join("")+`<text x="4" y="166" font-size="11" fill="var(--mut)">14 days ago → today ${tab==="m"?"· shaded = ideal range":""}</text></svg>`;
+let seed=f.id*97+13;const cell=()=>(seed=seed*16807%2147483647)/2147483647;
+$("heat").innerHTML=`<svg viewBox="0 0 300 130" width="100%"><title>Health map for ${f.n}</title>`+[...Array(5)].map((_,r)=>[...Array(10)].map((_,c)=>{const hv=clamp(f.hl+(cell()-.5)*26-(f.m<CROP[f.c].lo?(c>6?10:0):0));const col=hv>=75?"#65a30d":hv>=55?"#eab308":"#dc2626";return`<rect x="${c*30}" y="${r*26}" width="28" height="24" rx="4" fill="${col}"><title>${hv.toFixed(0)}%</title></rect>`}).join("")).join("")+`</svg><p class="note"><span style="color:#65a30d">■</span> healthy <span style="color:#eab308">■</span> watch <span style="color:#dc2626">■</span> stressed</p>`;
+$("ctl").innerHTML=l.map(x=>`<div class="ctl" style="margin-bottom:8px"><b style="min-width:90px">${x.n}</b><button class="b ${x.on?"p":""}" data-on="${x.id}" aria-pressed="${x.on}">${x.on?"Irrigating: stop":"Start irrigation"}</button><label class="note"><input type="checkbox" data-auto="${x.id}" ${x.auto?"checked":""}> Auto</label></div>`).join("");
+const al=l.flatMap(alerts);if(F.rain>70)al.push(["",`Rain likely (${Math.round(F.rain)}%): consider pausing irrigation`]);
+$("alerts").innerHTML=al.length?al.map(a=>`<div class="al ${a[0]}">⚠ ${a[1]}</div>`).join(""):'<p class="empty">No alerts. All fields are within range.</p>'}
+const trend=f=>f.hh[13]-f.hh[8];
+function answer(q){q=q.toLowerCase();const l=fs(),F=D[farm],f=l.find(x=>q.includes(x.n.toLowerCase()))||cur();if(!f)return{r:"No field selected.",e:"No fields match the crop filter.",rec:"Choose another crop.",c:30};const r=CROP[f.c];
+if(/irrigat|water now|dry/.test(q)&&!/predict|week/.test(q)){const need=f.m<r.lo,rain=F.rain>65;return{r:need?(rain?`${f.n} is below range but heavy rain is likely, so hold off.`:`Yes, ${f.n} needs irrigation.`):`No, ${f.n} does not need irrigation now.`,e:`Moisture ${f.m.toFixed(0)}% vs ideal ${r.lo}–${r.hi}%; temperature ${f.t}°C; rain probability ${Math.round(F.rain)}%.`,rec:need&&!rain?`Run irrigation about ${Math.round((r.lo+8-f.m)/2.6)*2} minutes (≈${Math.round(f.ha*18)} L per tick) and recheck.`:"Re-check in a few hours.",c:need?86:80}}
+if(/why|declin|health/.test(q)){const w=[...l].sort((a,b)=>trend(a)-trend(b))[0],rs=[];if(w.m<CROP[w.c].lo)rs.push("soil moisture below ideal");if(w.m>CROP[w.c].hi+8)rs.push("waterlogging");if(w.t>35)rs.push("heat stress");return{r:`${w.n} (${w.c}) shows the biggest health change: ${trend(w).toFixed(1)} points over 5 days.`,e:`Health ${w.hl.toFixed(0)}%, moisture ${w.m.toFixed(0)}%, temperature ${w.t}°C. Likely factors: ${rs.join(", ")||"no single dominant factor"}.`,rec:rs.includes("soil moisture below ideal")?"Increase irrigation frequency in short cycles.":"Inspect for pests or nutrient deficiency on site.",c:rs.length?78:55}}
+if(/attention|which field|priority/.test(q)){const s=l.map(x=>({x,s:(100-x.hl)+Math.max(0,CROP[x.c].lo-x.m)*2+Math.max(0,x.m-CROP[x.c].hi)*2+alerts(x).length*8})).sort((a,b)=>b.s-a.s);return{r:`${s[0].x.n} (${s[0].x.c}) needs attention first.`,e:s.slice(0,3).map(y=>`${y.x.n} score ${y.s.toFixed(0)}`).join(", ")+" (health gap, moisture deviation, alerts).",rec:`Visit ${s[0].x.n} and resolve: ${alerts(s[0].x).map(a=>a[1]).join("; ")||"routine check"}.`,c:84}}
+if(/predict|week|requirement|next/.test(q)){const adj=(F.rain>60?.75:1)*(sum(l.map(x=>x.t))/l.length>34?1.1:1),per=l.map(x=>({n:x.n,v:CROP[x.c].w*x.ha*7*adj*10}));return{r:`Estimated water need next week: ${(sum(per.map(p=>p.v))/1000).toFixed(1)} kL for ${l.length} field(s).`,e:per.map(p=>`${p.n}: ${(p.v/1000).toFixed(1)} kL`).join(", ")+`. Adjusted ×${adj.toFixed(2)} for rain probability ${Math.round(F.rain)}% and heat.`,rec:"Schedule irrigation for early morning and re-run this forecast after rainfall.",c:72}}
+return{r:"I can judge irrigation need, explain health trends, rank fields or forecast water use.",e:"Try a suggested prompt.",rec:"Rephrase around one of those.",c:30}}
+function ask(q){if(!q.trim())return toast("Type a question");const l=$("log");if(l.querySelector(".empty"))l.innerHTML="";l.insertAdjacentHTML("beforeend",'<div class="q"></div>');l.lastChild.textContent=q;l.insertAdjacentHTML("beforeend",'<div class="a dots" id="ld"><span></span><span></span><span></span></div>');l.scrollTop=1e9;
+setTimeout(()=>{const a=answer(q);$("ld").remove();l.insertAdjacentHTML("beforeend",`<dl class="a"><dt>Reason</dt><dd>${a.r}</dd><dt>Evidence</dt><dd>${a.e}</dd><dt>Recommendation</dt><dd>${a.rec}</dd><dt>Confidence</dt><dd>${a.c}%</dd></dl>`);l.scrollTop=1e9},600)}
+const go=()=>{clearInterval(timer);timer=setInterval(step,2500)};
+function cropOpts(){const cs=[...new Set(D[farm].f.map(f=>f.c))];$("crop").innerHTML="<option>All</option>"+cs.map(c=>`<option>${c}</option>`).join("");$("crop").value=crop}
+$("farm").innerHTML=Object.keys(FARMS).map(f=>`<option>${f}</option>`).join("");
+$("farm").onchange=e=>{farm=e.target.value;crop="All";sel=null;cropOpts();render()};$("crop").onchange=e=>{crop=e.target.value;sel=null;render()};
+$("fields").onclick=e=>{const b=e.target.closest(".fc");if(b){sel=+b.dataset.id;render()}};$("tabs").onclick=e=>{const b=e.target.closest("button");if(b){tab=b.dataset.t;render()}};
+$("ctl").onclick=e=>{const b=e.target.closest("[data-on]");if(b){const f=D[farm].f.find(x=>x.id==b.dataset.on);f.on=!f.on;f.auto=false;render();toast(f.n+(f.on?" irrigation started (auto off)":" irrigation stopped"))}};
+$("ctl").onchange=e=>{const id=e.target.dataset.auto;if(id){const f=D[farm].f.find(x=>x.id==id);f.auto=e.target.checked;toast(f.n+" auto mode "+(f.auto?"on":"off"))}};
+$("pause").onclick=()=>{paused=!paused;paused?clearInterval(timer):go();$("pause").textContent=paused?"Resume":"Pause";render()};
+$("chips").innerHTML=["Does this field need irrigation?","Why is crop health declining?","Which field needs attention?","Predict next week's water requirement."].map(c=>`<button class="b" type="button">${c}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};$("f").onsubmit=e=>{e.preventDefault();ask($("qi").value);$("qi").value=""};
+$("theme").onclick=()=>{const d=document.documentElement,n=(d.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark"?"light":"dark";d.dataset.theme=n;try{localStorage.setItem("av-theme",n)}catch(e){}};
+try{const t=localStorage.getItem("av-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+cropOpts();render();go();
+</script></body></html>

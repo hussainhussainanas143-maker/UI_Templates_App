@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TripMind</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f8f2e7;--card:#fffbf3;--ink:#33271a;--mut:#7a6a55;--line:#eadfca;--acc:#c2410c;--c2:#0e7490;--ok:#15803d;--bad:#b91c1c}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17120c;--card:#211a11;--ink:#f6ecdc;--mut:#b9a88f;--line:#392e1f;--acc:#fb923c;--c2:#22d3ee;--ok:#4ade80;--bad:#f87171}}
+:root[data-theme="dark"]{--bg:#17120c;--card:#211a11;--ink:#f6ecdc;--mut:#b9a88f;--line:#392e1f;--acc:#fb923c;--c2:#22d3ee;--ok:#4ade80;--bad:#f87171}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+button,input,select{font:inherit;color:var(--ink)}:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
+.b,input,select{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 11px}.b{cursor:pointer;transition:.15s}.b:hover{border-color:var(--acc)}.b.p{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600}.b.s{padding:3px 8px;font-size:13px}
+header{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;max-width:1200px;margin:auto;padding:14px 20px}
+h1{margin:0;font-size:25px}h1 i{color:var(--acc);font-style:normal}
+main{max-width:1200px;margin:auto;padding:0 20px 40px;display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+h2{margin:0 0 8px;font-size:15px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;align-items:end}.form label{font-size:13px;color:var(--mut);display:grid;gap:3px}
+.int{display:flex;gap:6px;flex-wrap:wrap}.int label{display:flex;align-items:center;gap:4px;background:var(--bg);padding:3px 10px;border-radius:99px;font-size:13px;cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.kpi small{color:var(--mut)}.kpi b{display:block;font-size:24px}
+.g{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.days{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px}.days button[aria-selected=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.st{display:flex;gap:8px;align-items:center;padding:8px;border-radius:10px;background:var(--bg);margin-bottom:6px;cursor:grab;border:1px dashed transparent}.st.over{border-color:var(--acc)}.st .n{width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:12px;flex:none}.st div{flex:1;min-width:0}
+.tag{font-size:11px;padding:1px 8px;border-radius:99px;background:var(--line);margin-right:4px}.note{font-size:12px;color:var(--mut)}
+.bar{height:9px;border-radius:9px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;transition:width .4s}
+.sk{height:70px;border-radius:10px;background:linear-gradient(90deg,var(--line),var(--bg),var(--line));background-size:200%;animation:s 1.2s infinite;margin-bottom:8px}@keyframes s{to{background-position:-200%}}
+.list{max-height:300px;overflow:auto}.pl{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.pl div{flex:1}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.chips button{border-radius:99px;font-size:13px}
+#log{max-height:300px;overflow:auto;display:grid;gap:8px}
+.q{justify-self:end;background:var(--acc);color:#fff;padding:6px 12px;border-radius:12px}
+.a{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;margin:0;font-size:14px}.a dt{font-weight:700;color:var(--acc);font-size:12px;text-transform:uppercase;margin-top:6px}.a dd{margin:0}
+.dots span{display:inline-block;width:7px;height:7px;margin:2px;border-radius:50%;background:var(--acc);animation:b 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}.empty{color:var(--mut);text-align:center;padding:12px}.err{color:var(--bad);font-size:13px}
+.pk{display:flex;gap:8px;align-items:center;padding:3px 0}.pk.d span{text-decoration:line-through;color:var(--mut)}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s}#toast.on{opacity:1}
+@media(max-width:860px){.g,.g2{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Trip<i>Mind</i> <span class="note">· simulated places and prices, not live bookings</span></h1><div class="row"><button class="b" id="theme" aria-label="Toggle theme">Theme</button><button class="b" id="reset">Reset</button></div></header>
+<main>
+<div class="card"><form class="form" id="tf"><label>Destination<select id="dest"></select></label><label>Start date<input id="start" type="date"></label><label>Days<input id="days" type="number" min="1" max="10"></label><label>Budget (₹)<input id="bud" type="number" min="1000" step="500"></label><label>Travelers<input id="trav" type="number" min="1" max="12"></label><label>Style<select id="sty"><option value="budget">Budget</option><option value="standard">Standard</option><option value="luxury">Luxury</option></select></label><button class="b p">Generate itinerary</button></form>
+<div class="int" id="int" style="margin-top:10px" role="group" aria-label="Interests"></div><p class="err" id="te" role="alert" hidden></p></div>
+<div class="kpis" id="kpis" aria-label="Trip summary"></div>
+<div class="g">
+<div class="card"><h2>Itinerary · drag to reorder or use arrows</h2><div class="days" id="dtabs" role="tablist"></div><div id="day"></div><div class="row" style="margin-top:6px"><input id="srch" type="search" aria-label="Search places" placeholder="Search places to add"></div><div class="list" id="pl"></div></div>
+<div class="card"><h2>Map view</h2><div id="map"></div><h2 style="margin-top:12px">Budget tracker</h2><div id="bt"></div></div></div>
+<div class="g2">
+<div class="card"><h2>Ask TripMind AI</h2><div class="chips" id="chips"></div><div id="log" aria-live="polite"><p class="empty">Ask for a plan, savings or an optimised route.</p></div><form class="row" id="f" style="margin-top:8px"><input id="qi" aria-label="Ask a question" placeholder="Create a 5-day Chennai trip."><button class="b p">Ask</button></form></div>
+<div class="card"><h2>Packing checklist</h2><div id="pk"></div><h2 style="margin-top:12px">Food picks</h2><div id="fd"></div></div></div>
+</main><div id="toast" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);
+const DB={Chennai:{food:["Filter coffee and idli at Mylapore","Seafood thali near Besant Nagar","Chettinad dinner in Nungambakkam"],p:[["Marina Beach","Beach",0,2,330,150,"Beach"],["Kapaleeshwarar Temple","Culture",0,1.5,250,170,"Culture"],["Fort St. George Museum","History",50,2,300,90,"History"],["Government Museum","History",50,2,260,110,"History"],["Mahabalipuram Shore Temple","History",40,4,380,250,"History"],["DakshinaChitra","Culture",300,3,350,225,"Culture"],["Elliot's Beach","Beach",0,2,300,215,"Beach"],["Pondy Bazaar, T Nagar","Shopping",0,2,170,150,"Shopping"],["Mylapore food walk","Food",600,2,240,160,"Food"],["Guindy National Park","Nature",50,2,150,190,"Nature"],["San Thome Basilica","Culture",0,1,280,175,"Culture"],["Phoenix Marketcity","Shopping",0,2,130,205,"Shopping"]]},Hyderabad:{food:["Dum biryani at a Charminar-area restaurant","Irani chai and osmania biscuits","Haleem (seasonal) near Pista House"],p:[["Charminar","History",25,1.5,200,150,"History"],["Golconda Fort","History",30,3,90,140,"History"],["Hussain Sagar Lake","Nature",0,2,210,90,"Nature"],["Salar Jung Museum","Culture",50,2.5,215,160,"Culture"],["Laad Bazaar","Shopping",0,1.5,195,155,"Shopping"],["Chowmahalla Palace","History",80,2,185,165,"History"],["Ramoji Film City","Fun",1500,6,330,210,"Culture"],["Paradise biryani lunch","Food",500,1.5,180,110,"Food"]]},Bengaluru:{food:["Dosa breakfast at a Malleswaram darshini","Filter coffee on VV Puram food street","Ragi mudde lunch"],p:[["Lalbagh Botanical Garden","Nature",30,2.5,210,200,"Nature"],["Bangalore Palace","History",270,2,190,90,"History"],["Cubbon Park","Nature",0,2,200,140,"Nature"],["Vidhana Soudha","History",0,1,190,130,"History"],["Commercial Street","Shopping",0,2,230,115,"Shopping"],["VV Puram food street","Food",400,2,200,205,"Food"],["Bannerghatta Biological Park","Nature",350,4,260,300,"Nature"]]}};
+const INT=["Beach","Culture","History","Food","Shopping","Nature"],ST={budget:{f:400,h:900,t:250},standard:{f:900,h:2400,t:600},luxury:{f:2200,h:6500,t:1400}};
+const SEED={dest:"Chennai",start:"2026-11-14",days:3,bud:25000,trav:2,sty:"standard",int:["Beach","Culture","Food"],it:[],fav:[],pk:{},sel:0};
+let S,drag=null;const load=()=>{try{S=JSON.parse(localStorage.getItem("tripmind"))||structuredClone(SEED)}catch(e){S=structuredClone(SEED)}};const save=()=>{try{localStorage.setItem("tripmind",JSON.stringify(S))}catch(e){}};
+const toast=m=>{const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove("on"),2000)};
+const inr=n=>"₹"+Math.round(n).toLocaleString("en-IN"),sum=a=>a.reduce((x,y)=>x+y,0);
+const P=()=>DB[S.dest].p,pl=n=>P().find(p=>p[0]===n);
+const dist=(a,b)=>Math.hypot(a[4]-b[4],a[5]-b[5]);
+const path=d=>{let t=0;for(let i=1;i<d.length;i++)t+=dist(pl(d[i-1]),pl(d[i]));return t};
+const order=names=>{if(names.length<3)return names;const r=[names[0]],rest=names.slice(1);while(rest.length){const l=pl(r[r.length-1]);rest.sort((a,b)=>dist(l,pl(a))-dist(l,pl(b)));r.push(rest.shift())}return r};
+function gen(){const sc=P().map(p=>({p,s:(S.int.includes(p[6])?3:0)+Math.random()}));sc.sort((a,b)=>b.s-a.s);const per=S.sty==="budget"?3:S.sty==="luxury"?2:3,pick=sc.slice(0,S.days*per).map(x=>x.p);
+const it=[...Array(S.days)].map(()=>[]);pick.sort((a,b)=>a[4]-b[4]).forEach((p,i)=>it[Math.min(S.days-1,Math.floor(i/per))].push(p[0]));S.it=it.map(order);S.sel=0}
+function cost(){const s=ST[S.style||S.sty],rooms=Math.ceil(S.trav/2),acts=sum(S.it.flat().map(n=>pl(n)?pl(n)[2]*S.trav:0));return{stay:s.h*rooms*Math.max(0,S.days-1),food:s.f*S.trav*S.days,trans:s.t*S.days*(S.trav>3?2:1),acts}}
+const total=c=>c.stay+c.food+c.trans+c.acts;
+function render(){const c=cost(),t=total(c),places=S.it.flat().length,hrs=sum(S.it.flat().map(n=>pl(n)?pl(n)[3]:0)),left=Math.ceil((new Date(S.start)-new Date())/864e5);
+$("kpis").innerHTML=[["Trip budget",inr(S.bud)],["Estimated cost",inr(t)],["Days to go",isNaN(left)?"–":left>0?left:"Started"],["Places",places],["Activity hours",hrs.toFixed(1)+" h"]].map((k,i)=>`<div class="card kpi"><small>${k[0]}</small><b${i===1&&t>S.bud?' style="color:var(--bad)"':""}>${k[1]}</b></div>`).join("");
+$("dtabs").innerHTML=S.it.map((_,i)=>`<button class="b" role="tab" aria-selected="${i===S.sel}" data-d="${i}">Day ${i+1}</button>`).join("");
+const d=S.it[S.sel]||[];$("day").innerHTML=d.length?d.map((n,i)=>{const p=pl(n),f=S.fav.includes(n);return`<div class="st" draggable="true" data-i="${i}"><span class="n">${i+1}</span><div><b>${n}</b><br><span class="tag">${p[1]}</span><span class="note">${p[3]} h · ${p[2]?inr(p[2])+" pp":"free"}</span></div><button class="b s" data-up="${i}" aria-label="Move ${n} up">↑</button><button class="b s" data-dn="${i}" aria-label="Move ${n} down">↓</button><button class="b s" data-fav="${n}" aria-pressed="${f}" aria-label="Favourite ${n}">${f?"★":"☆"}</button><button class="b s" data-rm="${i}" aria-label="Remove ${n}">✕</button></div>`}).join(""):'<p class="empty">No stops on this day. Add places below or generate an itinerary.</p>';
+const q=$("srch").value.trim().toLowerCase(),r=P().filter(p=>!q||p[0].toLowerCase().includes(q)||p[1].toLowerCase().includes(q));
+$("pl").innerHTML=r.length?r.map(p=>`<div class="pl"><div><b>${p[0]}</b> <span class="tag">${p[1]}</span><br><span class="note">${p[2]?inr(p[2])+" pp":"free"} · ${p[3]} h</span></div><button class="b s" data-add="${p[0]}" aria-label="Add ${p[0]} to day ${S.sel+1}">+ Day ${S.sel+1}</button></div>`).join(""):'<p class="empty">No places match your search.</p>';
+const pts=n=>pl(n);let svg='<svg viewBox="0 0 420 330" width="100%"><title>Stops for selected day</title><rect width="420" height="330" rx="12" fill="var(--bg)"/>';S.it.forEach((dd,i)=>{if(i!==S.sel)dd.forEach(n=>{const p=pts(n);if(p)svg+=`<circle cx="${p[4]}" cy="${p[5]}" r="4" fill="var(--mut)" opacity=".4"/>`})});
+if(d.length){svg+=`<polyline fill="none" stroke="var(--acc)" stroke-width="2" stroke-dasharray="5 4" points="${d.map(n=>pts(n)[4]+","+pts(n)[5]).join(" ")}"/>`+d.map((n,i)=>`<circle cx="${pts(n)[4]}" cy="${pts(n)[5]}" r="12" fill="var(--acc)"/><text x="${pts(n)[4]}" y="${pts(n)[5]+4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${i+1}</text><text x="${pts(n)[4]+15}" y="${pts(n)[5]+4}" font-size="10" fill="var(--ink)">${n.split(" ").slice(0,2).join(" ")}</text>`).join("")}
+$("map").innerHTML=svg+`</svg><p class="note">Stylised map. Route ≈ ${(path(d)*.12).toFixed(1)} km for this day (illustrative).</p>`;
+const rows=[["Stay",c.stay,"var(--c2)"],["Food",c.food,"var(--acc)"],["Transport",c.trans,"var(--ok)"],["Activities",c.acts,"#a855f7"]];
+$("bt").innerHTML=rows.map(x=>`<div style="margin-bottom:6px"><div class="row" style="justify-content:space-between"><span>${x[0]}</span><span>${inr(x[1])}</span></div><div class="bar"><i style="width:${t?x[1]/t*100:0}%;background:${x[2]}"></i></div></div>`).join("")+`<div class="bar" style="height:12px"><i style="width:${Math.min(100,t/S.bud*100)}%;background:${t>S.bud?"var(--bad)":"var(--ok)"}"></i></div><p class="note">${t>S.bud?"Over budget by "+inr(t-S.bud):"Within budget, "+inr(S.bud-t)+" left"}</p>`;
+const base=["ID and tickets","Phone charger and power bank","Reusable water bottle","Basic medicines","Comfortable walking shoes"];if(S.int.includes("Beach"))base.push("Sunscreen and swimwear");if(S.int.includes("Culture")||S.int.includes("History"))base.push("Modest clothing for temples");if(S.int.includes("Nature"))base.push("Insect repellent");if(["Chennai"].includes(S.dest))base.push("Compact umbrella (Oct–Dec monsoon)");
+$("pk").innerHTML=base.map((x,i)=>`<label class="pk ${S.pk[x]?"d":""}"><input type="checkbox" ${S.pk[x]?"checked":""} data-pk="${x}"><span>${x}</span></label>`).join("");
+$("fd").innerHTML=DB[S.dest].food.map(f=>`<div class="pk">🍽 ${f}</div>`).join("")}
+function answer(q){q=q.toLowerCase();
+const m=q.match(/(\d+)[- ]day/),city=Object.keys(DB).find(c=>q.includes(c.toLowerCase()));
+if(/create|plan a|trip/.test(q)&&(m||city)&&!/budget trip/.test(q)){if(city)S.dest=city;if(m)S.days=Math.min(10,+m[1]);gen();save();sync();render();const c=cost();return{r:`Built a ${S.days}-day ${S.dest} itinerary for ${S.trav} traveler(s).`,e:`${S.it.flat().length} stops matching ${S.int.join(", ")}; estimated ${inr(total(c))} vs budget ${inr(S.bud)}.`,rec:total(c)>S.bud?"Estimated cost exceeds budget: try the 'save money' prompt.":"Fits your budget. Review each day and reorder if needed.",c:80}}
+if(/budget trip|cheap|budget/.test(q)&&!/remove|save/.test(q)){const b=total(cost());S.sty="budget";gen();save();sync();render();const a=total(cost());return{r:"Switched to a budget style with free and low-cost stops.",e:`Estimated cost ${inr(b)} → ${inr(a)}.`,rec:`Saves ${inr(Math.max(0,b-a))}. Hostel or guesthouse stays account for most of it.`,c:74}}
+if(/optimi|route|reorder/.test(q)){const before=sum(S.it.map(path));S.it=S.it.map(order);const after=sum(S.it.map(path));save();render();return{r:"Reordered each day by nearest-next-stop.",e:`Route length ${(before*.12).toFixed(1)} km → ${(after*.12).toFixed(1)} km (illustrative).`,rec:before-after>1?"Less travel time frees room for another stop.":"Your route was already efficient.",c:77}}
+if(/remove|save|cut/.test(q)){const c=cost(),act=S.it.flat().map(n=>({n,v:pl(n)[2]*S.trav})).sort((a,b)=>b.v-a.v),lux=ST[S.sty].h-ST.standard.h;return{r:total(c)>S.bud?`You are ${inr(total(c)-S.bud)} over budget.`:"You are within budget; these are optional savings.",e:`Costliest activities: ${act.slice(0,3).map(x=>x.n+" "+inr(x.v)).join(", ")}. Stay is ${inr(c.stay)}.`,rec:`Drop ${act[0].n} to save ${inr(act[0].v)}${S.sty!=="budget"?"; a lower-tier stay saves much more":""}.`,c:83}}
+return{r:"I can create a trip, make it cheaper, optimise the route or find savings.",e:"Try a suggested prompt.",rec:"Rephrase around one of those.",c:30}}
+function ask(q){if(!q.trim())return toast("Type a question");const l=$("log");if(l.querySelector(".empty"))l.innerHTML="";l.insertAdjacentHTML("beforeend",'<div class="q"></div>');l.lastChild.textContent=q;l.insertAdjacentHTML("beforeend",'<div class="a dots" id="ld"><span></span><span></span><span></span></div>');l.scrollTop=1e9;
+setTimeout(()=>{const a=answer(q);$("ld").remove();l.insertAdjacentHTML("beforeend",`<dl class="a"><dt>Reason</dt><dd>${a.r}</dd><dt>Evidence</dt><dd>${a.e}</dd><dt>Recommendation</dt><dd>${a.rec}</dd><dt>Confidence</dt><dd>${a.c}%</dd></dl>`);l.scrollTop=1e9},600)}
+function sync(){$("dest").value=S.dest;$("start").value=S.start;$("days").value=S.days;$("bud").value=S.bud;$("trav").value=S.trav;$("sty").value=S.sty;$("int").innerHTML=INT.map(i=>`<label><input type="checkbox" value="${i}" ${S.int.includes(i)?"checked":""}> ${i}</label>`).join("")}
+$("dest").innerHTML=Object.keys(DB).map(c=>`<option>${c}</option>`).join("");
+$("tf").onsubmit=e=>{e.preventDefault();const d=+$("days").value,b=+$("bud").value,t=+$("trav").value,er=$("te");if(!(d>=1&&d<=10&&b>=1000&&t>=1&&t<=12)){er.hidden=false;er.textContent="Days 1–10, budget at least ₹1,000, travelers 1–12.";return}er.hidden=true;S.dest=$("dest").value;S.start=$("start").value;S.days=d;S.bud=b;S.trav=t;S.sty=$("sty").value;S.int=[...$("int").querySelectorAll("input:checked")].map(i=>i.value);
+$("day").innerHTML='<div class="sk"></div><div class="sk"></div>';setTimeout(()=>{gen();save();render();toast("Itinerary generated")},700)};
+$("dtabs").onclick=e=>{const b=e.target.closest("[data-d]");if(b){S.sel=+b.dataset.d;render()}};
+$("srch").oninput=render;
+const mv=(i,j)=>{const d=S.it[S.sel];if(j<0||j>=d.length)return;d.splice(j,0,d.splice(i,1)[0]);save();render()};
+$("day").onclick=e=>{const t=e.target.closest("button");if(!t)return;const d=t.dataset;if(d.up!=null)mv(+d.up,+d.up-1);if(d.dn!=null)mv(+d.dn,+d.dn+1);if(d.rm!=null){S.it[S.sel].splice(+d.rm,1);save();render();toast("Removed")}if(d.fav){const k=S.fav.indexOf(d.fav);k<0?S.fav.push(d.fav):S.fav.splice(k,1);save();render();toast(k<0?"Added to favourites":"Removed from favourites")}};
+$("day").ondragstart=e=>{const s=e.target.closest(".st");if(s){drag=+s.dataset.i;e.dataTransfer.effectAllowed="move"}};$("day").ondragover=e=>{e.preventDefault();const s=e.target.closest(".st");document.querySelectorAll(".st").forEach(x=>x.classList.toggle("over",x===s))};
+$("day").ondrop=e=>{e.preventDefault();const s=e.target.closest(".st");if(s&&drag!=null)mv(drag,+s.dataset.i);drag=null};
+$("pl").onclick=e=>{const n=e.target.dataset.add;if(n){if(!S.it.length)S.it=[[]];if(S.it[S.sel].includes(n))return toast("Already on this day");S.it[S.sel].push(n);save();render();toast("Added to day "+(S.sel+1))}};
+$("pk").onchange=e=>{if(e.target.dataset.pk){S.pk[e.target.dataset.pk]=e.target.checked;save();render()}};
+$("chips").innerHTML=["Create a 5-day Chennai trip.","Plan a budget trip.","Optimize this itinerary.","What can I remove to save money?"].map(c=>`<button class="b" type="button">${c}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};$("f").onsubmit=e=>{e.preventDefault();ask($("qi").value);$("qi").value=""};
+$("theme").onclick=()=>{const d=document.documentElement,n=(d.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark"?"light":"dark";d.dataset.theme=n;try{localStorage.setItem("tm-theme",n)}catch(e){}};
+$("reset").onclick=()=>{S=structuredClone(SEED);gen();save();sync();render();toast("Reset")};
+try{const t=localStorage.getItem("tm-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+load();if(!S.it.length)gen();sync();render();
+</script></body></html>

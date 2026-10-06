@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ResearchLens</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#faf7f0;--card:#fffdf8;--ink:#2a2118;--mut:#74685a;--line:#e7dfd0;--acc:#9a3412;--c2:#0f766e;--c3:#4338ca}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15110d;--card:#1e1913;--ink:#f1e9dc;--mut:#b3a690;--line:#332b21;--acc:#fb923c;--c2:#2dd4bf;--c3:#a5b4fc}}
+:root[data-theme="dark"]{--bg:#15110d;--card:#1e1913;--ink:#f1e9dc;--mut:#b3a690;--line:#332b21;--acc:#fb923c;--c2:#2dd4bf;--c3:#a5b4fc}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Georgia,"Times New Roman",serif;overflow-x:hidden}
+button,input,select{font:14px system-ui,sans-serif;color:var(--ink)}
+:focus-visible{outline:3px solid var(--c3);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;max-width:1200px;margin:auto;padding:16px 20px;border-bottom:2px solid var(--ink)}
+h1{margin:0;font-size:28px;letter-spacing:-.5px}h1 i{color:var(--acc)}
+.b,input,select{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:7px 11px}.b{cursor:pointer;transition:.15s}.b:hover{border-color:var(--acc)}.b.p{background:var(--acc);color:var(--card);border-color:var(--acc);font-weight:600}
+main{max-width:1200px;margin:auto;padding:16px 20px 40px;display:grid;gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px;min-width:0}
+.kpi small{font:12px system-ui;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}.kpi b{display:block;font-size:28px}
+h2{margin:0 0 8px;font-size:13px;font:600 12px system-ui;text-transform:uppercase;letter-spacing:1px;color:var(--mut)}
+.fr{display:flex;flex-wrap:wrap;gap:8px}.fr input{flex:1;min-width:200px}
+.split{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.list{display:grid;gap:8px;max-height:520px;overflow:auto}
+.pub{text-align:left;width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;cursor:pointer}.pub:hover{border-color:var(--acc)}
+.pub b{display:block;font-size:16px}.pub span{font:13px system-ui;color:var(--mut)}
+.tag{display:inline-block;font:11px system-ui;padding:1px 8px;border-radius:99px;background:var(--line);margin-right:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.chips button{border-radius:99px;font-size:13px}
+#log{max-height:300px;overflow:auto;display:grid;gap:8px}
+.q{justify-self:end;background:var(--acc);color:var(--card);padding:6px 12px;border-radius:10px;font:14px system-ui}
+.a{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin:0;font:14px/1.5 system-ui}.a dt{font-weight:700;color:var(--acc);font-size:11px;text-transform:uppercase;margin-top:6px}.a dd{margin:0}
+.dots span{display:inline-block;width:7px;height:7px;margin:2px;border-radius:50%;background:var(--acc);animation:b 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}
+.empty{color:var(--mut);text-align:center;padding:14px;font:14px system-ui}.note{font:12px system-ui;color:var(--mut)}
+.sk{height:60px;border-radius:6px;background:linear-gradient(90deg,var(--line),var(--bg),var(--line));background-size:200%;animation:s 1.2s infinite}@keyframes s{to{background-position:-200%}}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);max-width:min(560px,92vw);padding:20px}dialog::backdrop{background:rgba(0,0,0,.5)}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;opacity:0;pointer-events:none;transition:.25s;font:14px system-ui}#toast.on{opacity:1}
+@media(max-width:860px){.split,.g2{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Research<i>Lens</i> <span class="note">· simulated demo publications</span></h1><div class="row"><button class="b" id="clear">Clear filters</button><button class="b" id="theme" aria-label="Toggle theme">Theme</button></div></header>
+<main>
+<div class="kpis" id="kpis" aria-label="Key metrics"></div>
+<div class="card fr"><input id="q" type="search" aria-label="Search publications or authors" placeholder="Search title or author"><select id="fa" aria-label="Research area"></select><select id="fy" aria-label="Year"></select><select id="fu" aria-label="Author"></select><select id="so" aria-label="Sort"><option value="c">Most cited</option><option value="y">Newest</option></select></div>
+<div class="split">
+<div class="card"><h2>Publications <span id="cnt"></span></h2><div class="list" id="list" aria-live="polite"></div></div>
+<div class="card"><h2>Ask ResearchLens AI</h2><div class="chips" id="chips"></div><div id="log" aria-live="polite"><p class="empty">Ask about areas, researchers, growth or collaboration.</p></div>
+<form class="row" id="f" style="margin-top:8px"><input id="qi" aria-label="Ask a question" placeholder="What topics are growing fastest?"><button class="b p">Ask</button></form></div></div>
+<div class="g2"><div class="card"><h2>Publications by year</h2><div id="c1" role="img" aria-label="Publications per year"></div></div><div class="card"><h2>Citation trend by year</h2><div id="c2" role="img" aria-label="Citations per publication year"></div></div></div>
+<div class="g2"><div class="card"><h2>Research areas</h2><div id="c3" role="img" aria-label="Publications per research area"></div></div><div class="card"><h2>Collaboration network · click an author</h2><div id="net"></div></div></div>
+<div class="card"><h2>Author impact</h2><div id="c4" role="img" aria-label="Total citations per author"></div></div>
+</main>
+<dialog id="dlg" aria-labelledby="dt"><h3 id="dt" style="margin-top:0"></h3><div id="db"></div><p><button class="b p" id="close">Close</button></p></dialog>
+<div id="toast" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);
+const AU=[["Dr. Meera Krishnan","IIT Madras"],["Prof. Arjun Venkatesh","Anna University"],["Dr. Sana Iqbal","Sai University"],["Dr. Rohan Mehta","IIT Madras"],["Dr. Lakshmi Narayanan","Anna University"],["Dr. Priya Raghavan","Sai University"],["Dr. Kavin Subramanian","Sai University"],["Prof. Ananya Rao","IIT Madras"]];
+const AREAS=["Machine Learning","Climate Informatics","Healthcare AI","Cybersecurity","IoT & Smart Cities","NLP"];
+const P=[["Attention-efficient transformers for Indian languages",2024,5,[0,2],58,"ACL Findings"],["Federated learning for rural clinics",2025,2,[2,5],21,"Nature Digital Medicine"],["Flood nowcasting with graph networks",2023,1,[1,4],64,"Environmental Modelling"],["Zero-trust analytics for campus networks",2024,3,[6,3],33,"IEEE S&P Workshops"],["Edge sensors for urban air quality",2022,4,[1,7],47,"IEEE IoT Journal"],["Few-shot classification under label noise",2022,0,[0,3],88,"ICML"],["Heat-risk mapping for Chennai wards",2025,1,[4,5],12,"Climate Risk Mgmt"],["Retinal screening with self-supervision",2023,2,[7,2],72,"MICCAI"],["Phishing detection with small language models",2025,3,[6,2],19,"USENIX Security"],["Traffic signal control via reinforcement learning",2023,4,[1,3],41,"Transportation Research C"],["Low-resource machine translation benchmarks",2024,5,[0,5],37,"EMNLP"],["Sparse mixture-of-experts scaling laws",2025,0,[3,7],26,"NeurIPS"],["Water-demand forecasting for smart grids",2024,4,[4,6],29,"Applied Energy"],["Clinical note summarisation with guardrails",2025,2,[5,0],17,"JAMIA"],["Anomaly detection for industrial IoT",2022,3,[1,4],52,"Computers & Security"],["Monsoon variability and crop planning",2021,1,[7,4],69,"Agricultural Systems"],["Speech recognition for Tamil dialects",2023,5,[0,6],44,"Interspeech"],["Explainable models for diabetes risk",2021,2,[2,7],61,"Lancet Digital Health"],["Contrastive pre-training for tabular data",2024,0,[3,6],31,"ICLR"],["Satellite-driven drought indices",2024,1,[7,1],23,"Remote Sensing"],["Quantised models on microcontrollers",2025,4,[3,6],14,"TinyML Symposium"],["Intrusion detection with graph learning",2023,3,[1,2],39,"IEEE TIFS"],["Question answering over legal texts",2024,5,[5,0],27,"ACL"],["Active learning for medical imaging",2022,0,[7,2],55,"Medical Image Analysis"]].map((p,i)=>({id:i,t:p[0],y:p[1],a:p[2],au:p[3],c:p[4],v:p[5]}));
+let F={q:"",a:"All",y:"All",u:"All",s:"c"};
+const COL=["#9a3412","#0f766e","#4338ca","#a16207","#be185d","#15803d"];
+const toast=m=>{const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove("on"),2000)};
+const rows=()=>{const q=F.q.trim().toLowerCase();return P.filter(p=>(!q||p.t.toLowerCase().includes(q)||p.au.some(i=>AU[i][0].toLowerCase().includes(q)))&&(F.a==="All"||AREAS[p.a]===F.a)&&(F.y==="All"||p.y==+F.y)&&(F.u==="All"||p.au.includes(+F.u))).sort((a,b)=>F.s==="c"?b.c-a.c:b.y-a.y||b.c-a.c)};
+const sum=a=>a.reduce((x,y)=>x+y,0);
+function bars(items,fmt=v=>v){if(!items.length)return'<p class="empty">No data for these filters.</p>';const mx=Math.max(...items.map(i=>i[1]),1);return`<svg viewBox="0 0 420 ${items.length*30+6}" width="100%">`+items.map((x,i)=>`<text x="0" y="${i*30+19}" font-size="12" fill="var(--mut)" font-family="system-ui">${x[0]}</text><rect x="140" y="${i*30+5}" width="${Math.max(2,x[1]/mx*230)}" height="18" rx="3" fill="${x[2]||"var(--acc)"}"><title>${x[0]}: ${x[1]}</title></rect><text x="${146+x[1]/mx*230}" y="${i*30+19}" font-size="12" fill="var(--ink)" font-family="system-ui">${fmt(x[1])}</text>`).join("")+"</svg>"}
+function cols(items,u=""){if(!items.length)return'<p class="empty">No data for these filters.</p>';const mx=Math.max(...items.map(i=>i[1]),1),w=420/items.length;return`<svg viewBox="0 0 420 170" width="100%">`+items.map((x,i)=>{const h=x[1]/mx*115;return`<rect x="${i*w+8}" y="${140-h}" width="${w-16}" height="${h}" rx="3" fill="var(--acc)"><title>${x[0]}: ${x[1]}${u}</title></rect><text x="${i*w+w/2}" y="156" text-anchor="middle" font-size="12" fill="var(--mut)" font-family="system-ui">${x[0]}</text><text x="${i*w+w/2}" y="${134-h}" text-anchor="middle" font-size="12" fill="var(--ink)" font-family="system-ui">${x[1]}</text>`}).join("")+"</svg>"}
+function render(){const r=rows(),yrs=[...new Set(P.map(p=>p.y))].sort();$("cnt").textContent="("+r.length+")";
+const au=new Set(r.flatMap(p=>p.au)),multi=r.filter(p=>new Set(p.au.map(i=>AU[i][1])).size>1).length;
+$("kpis").innerHTML=[["Publications",r.length],["Citations",sum(r.map(p=>p.c))],["Active researchers",au.size],["Top area",(()=>{const m={};r.forEach(p=>m[p.a]=(m[p.a]||0)+1);const k=Object.keys(m).sort((a,b)=>m[b]-m[a])[0];return k!=null?AREAS[k]:"–"})()],["Collaboration score",r.length?Math.round(multi/r.length*100)+"%":"–"]].map(k=>`<div class="card kpi"><small>${k[0]}</small><b style="font-size:${String(k[1]).length>9?18:28}px">${k[1]}</b></div>`).join("");
+$("list").innerHTML=r.length?r.map(p=>`<button class="pub" data-i="${p.id}"><b>${p.t}</b><span>${p.au.map(i=>AU[i][0]).join(", ")}</span><br><span class="tag">${AREAS[p.a]}</span><span class="tag">${p.y}</span><span class="tag">${p.c} citations</span></button>`).join(""):'<p class="empty">No publications match. Try clearing filters.</p>';
+$("c1").innerHTML=cols(yrs.map(y=>[y,r.filter(p=>p.y===y).length]));
+$("c2").innerHTML=cols(yrs.map(y=>[y,sum(r.filter(p=>p.y===y).map(p=>p.c))]));
+$("c3").innerHTML=bars(AREAS.map((a,i)=>[a,r.filter(p=>p.a===i).length,COL[i]]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]));
+$("c4").innerHTML=bars(AU.map((a,i)=>[a[0],sum(r.filter(p=>p.au.includes(i)).map(p=>p.c))]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]),v=>v+" cites");
+const pos=AU.map((_,i)=>[200+130*Math.cos(i/AU.length*6.283-1.57),130+95*Math.sin(i/AU.length*6.283-1.57)]),E={};r.forEach(p=>{const k=p.au.slice().sort().join("-");E[k]=(E[k]||0)+1});
+const IC={"IIT Madras":"#4338ca","Anna University":"#0f766e","Sai University":"#9a3412"};
+$("net").innerHTML=r.length?`<svg viewBox="0 0 400 270" width="100%"><title>Co-authorship network</title>`+Object.entries(E).map(([k,n])=>{const[a,b]=k.split("-");return`<line x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}" stroke="var(--mut)" stroke-width="${1+n*1.2}" opacity=".5"/>`}).join("")+AU.map((a,i)=>`<g tabindex="0" role="button" aria-label="Filter by ${a[0]}" data-u="${i}" style="cursor:pointer"><circle cx="${pos[i][0]}" cy="${pos[i][1]}" r="${F.u==i?15:11}" fill="${IC[a[1]]}" stroke="var(--ink)" stroke-width="${F.u==i?3:0}"/><text x="${pos[i][0]}" y="${pos[i][1]+(pos[i][1]>130?26:-17)}" text-anchor="middle" font-size="10" fill="var(--ink)" font-family="system-ui">${a[0].replace(/^(Dr|Prof)\. /,"")}</text></g>`).join("")+`</svg><p class="note"><span style="color:#4338ca">●</span> IIT Madras <span style="color:#0f766e">●</span> Anna University <span style="color:#9a3412">●</span> Sai University. Line thickness = joint papers.</p>`:'<p class="empty">No collaborations to show.</p>'}
+function modal(i){const p=P[i];$("dt").textContent=p.t;$("db").innerHTML=`<p>${p.au.map(a=>AU[a][0]+" ("+AU[a][1]+")").join("<br>")}</p><p><span class="tag">${AREAS[p.a]}</span><span class="tag">${p.y}</span><span class="tag">${p.v}</span><span class="tag">${p.c} citations</span></p><p class="note">Simulated demo record. Citations per year since publication: ${(p.c/Math.max(1,2026-p.y)).toFixed(1)}.</p>`;$("dlg").showModal()}
+function answer(q){q=q.toLowerCase();const r=P;
+if(/summar|area|overview/.test(q)){let i=AREAS.findIndex(a=>q.includes(a.toLowerCase().split(" ")[0]));if(i<0&&F.a!=="All")i=AREAS.indexOf(F.a);if(i<0)i=0;const l=r.filter(p=>p.a===i),top=[...l].sort((a,b)=>b.c-a.c)[0],ai=new Set(l.flatMap(p=>p.au));return{r:`${AREAS[i]} has ${l.length} publications and ${sum(l.map(p=>p.c))} citations from ${ai.size} researchers.`,e:`Most cited: "${top.t}" (${top.c}). Years active: ${Math.min(...l.map(p=>p.y))}–${Math.max(...l.map(p=>p.y))}.`,rec:`Read the top paper first, then explore ${[...ai].slice(0,2).map(x=>AU[x][0]).join(" and ")}'s other work.`,c:84}}
+if(/active|researcher|author|who/.test(q)){const s=AU.map((a,i)=>({n:a[0],i:a[1],c:r.filter(p=>p.au.includes(i)).length,z:sum(r.filter(p=>p.au.includes(i)).map(p=>p.c))})).sort((a,b)=>b.c-a.c||b.z-a.z);return{r:`${s[0].n} (${s[0].i}) is the most active with ${s[0].c} papers.`,e:s.slice(0,3).map(x=>`${x.n}: ${x.c} papers, ${x.z} citations`).join("; "),rec:"Invite the top three to lead a joint seminar series.",c:90}}
+if(/grow|trend|fast|topic/.test(q)){const g=AREAS.map((a,i)=>({a,n:r.filter(p=>p.a===i&&p.y>=2024).length,o:r.filter(p=>p.a===i&&p.y<2024).length})).sort((x,y)=>(y.n-y.o)-(x.n-x.o));return{r:`${g[0].a} is growing fastest: ${g[0].n} papers since 2024 vs ${g[0].o} before.`,e:g.slice(0,3).map(x=>`${x.a} ${x.o}→${x.n}`).join("; "),rec:`Allocate seed funding toward ${g[0].a} and ${g[1].a}.`,c:76}}
+if(/collab|opportun|partner/.test(q)){const co=new Set(r.map(p=>p.au.slice().sort().join("-"))),o=[];for(let a=0;a<AU.length;a++)for(let b=a+1;b<AU.length;b++)if(AU[a][1]!==AU[b][1]&&!co.has(a+"-"+b)){const sh=AREAS.map((_,k)=>r.some(p=>p.a===k&&p.au.includes(a))&&r.some(p=>p.a===k&&p.au.includes(b))?k:-1).filter(k=>k>=0);if(sh.length)o.push({a,b,k:sh[0],n:sh.length})}o.sort((x,y)=>y.n-x.n);const t=o[0];return t?{r:`${AU[t.a][0]} and ${AU[t.b][0]} have never co-authored but share ${AREAS[t.k]} work.`,e:`They sit in different institutions (${AU[t.a][1]}, ${AU[t.b][1]}); ${o.length} such pairs exist.`,rec:"Propose a joint workshop paper; cross-institution papers tend to broaden citations.",c:68}:{r:"No unexplored cross-institution pairs found.",e:"All overlapping pairs already collaborate.",rec:"Look at external partners.",c:50}}
+return{r:"I can summarise an area, name active researchers, spot growing topics or suggest collaborations.",e:"Try a suggested prompt.",rec:"Rephrase around one of those.",c:30}}
+function ask(q){if(!q.trim())return toast("Type a question");const l=$("log");if(l.querySelector(".empty"))l.innerHTML="";l.insertAdjacentHTML("beforeend",'<div class="q"></div>');l.lastChild.textContent=q;l.insertAdjacentHTML("beforeend",'<div class="a dots" id="ld"><span></span><span></span><span></span></div>');l.scrollTop=1e9;
+setTimeout(()=>{const a=answer(q);$("ld").remove();l.insertAdjacentHTML("beforeend",`<dl class="a"><dt>Reason</dt><dd>${a.r}</dd><dt>Evidence</dt><dd>${a.e}</dd><dt>Recommendation</dt><dd>${a.rec}</dd><dt>Confidence</dt><dd>${a.c}%</dd></dl>`);l.scrollTop=1e9},600)}
+$("fa").innerHTML="<option>All</option>"+AREAS.map(a=>`<option>${a}</option>`).join("");$("fy").innerHTML="<option>All</option>"+[...new Set(P.map(p=>p.y))].sort().reverse().map(y=>`<option>${y}</option>`).join("");$("fu").innerHTML='<option value="All">All authors</option>'+AU.map((a,i)=>`<option value="${i}">${a[0]}</option>`).join("");
+$("q").oninput=e=>{F.q=e.target.value;render()};$("fa").onchange=e=>{F.a=e.target.value;render()};$("fy").onchange=e=>{F.y=e.target.value;render()};$("fu").onchange=e=>{F.u=e.target.value;render()};$("so").onchange=e=>{F.s=e.target.value;render()};
+$("clear").onclick=()=>{F={q:"",a:"All",y:"All",u:"All",s:"c"};$("q").value="";["fa","fy","fu"].forEach(i=>$(i).selectedIndex=0);$("so").value="c";render();toast("Filters cleared")};
+$("list").onclick=e=>{const b=e.target.closest(".pub");if(b)modal(+b.dataset.i)};
+const pk=e=>{const g=e.target.closest("g[data-u]");if(g){F.u=g.dataset.u;$("fu").value=F.u;render();toast("Filtered by "+AU[F.u][0])}};$("net").onclick=pk;$("net").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pk(e)}};
+$("close").onclick=()=>$("dlg").close();
+$("chips").innerHTML=["Summarize Machine Learning research.","Who are the most active researchers?","What topics are growing fastest?","Find collaboration opportunities."].map(c=>`<button class="b" type="button">${c}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};$("f").onsubmit=e=>{e.preventDefault();ask($("qi").value);$("qi").value=""};
+$("theme").onclick=()=>{const d=document.documentElement,n=(d.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark"?"light":"dark";d.dataset.theme=n;try{localStorage.setItem("rl-theme",n)}catch(e){}};
+try{const t=localStorage.getItem("rl-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+$("list").innerHTML='<div class="sk"></div>';setTimeout(render,300);
+</script></body></html>
