@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ClimatePulse</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef5f4;--side:#0b3b3c;--card:#fff;--ink:#12302f;--mut:#5a7270;--line:#d8e6e4;--acc:#0d9488;--amb:#f59e0b;--bad:#dc2626;--ok:#16a34a}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1716;--side:#06201f;--card:#112826;--ink:#e3f2f0;--mut:#8fb0ac;--line:#1f3d3a;--acc:#2dd4bf}}
+:root[data-theme="dark"]{--bg:#0a1716;--side:#06201f;--card:#112826;--ink:#e3f2f0;--mut:#8fb0ac;--line:#1f3d3a;--acc:#2dd4bf}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+:focus-visible{outline:3px solid var(--amb);outline-offset:2px}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{background:var(--side);color:#e3f2f0;padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+aside h1{font-size:19px;margin:0 8px 4px}aside h1 span{color:var(--amb)}
+aside p{font-size:12px;margin:0 8px 14px;opacity:.7}
+aside button{display:flex;width:100%;justify-content:space-between;align-items:center;background:none;border:0;color:inherit;font:inherit;padding:9px 10px;border-radius:9px;cursor:pointer;transition:.15s;text-align:left}
+aside button:hover{background:rgba(255,255,255,.1)}aside button[aria-pressed=true]{background:rgba(255,255,255,.18);font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%}
+section.main{padding:18px;display:grid;gap:14px;min-width:0}
+.top{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.top h2{margin:0;font-size:22px}
+select,button.b,input{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer}
+button.b:hover{border-color:var(--acc)}button.p{background:var(--acc);color:#04201e;border-color:var(--acc);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.kpi small{color:var(--mut)}.kpi b{display:block;font-size:24px}
+h3{margin:0 0 8px;font-size:15px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.g3{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
+.tabs{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}.tabs button[aria-selected=true]{background:var(--acc);color:#04201e}
+.sk{height:120px;border-radius:10px;background:linear-gradient(90deg,var(--line),var(--bg),var(--line));background-size:200%;animation:s 1.2s infinite}
+@keyframes s{to{background-position:-200%}}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:420px}th,td{padding:6px;text-align:left;border-bottom:1px solid var(--line)}th{color:var(--mut);font-size:13px}
+th button{all:unset;cursor:pointer;color:var(--acc);font-weight:600}
+.alert{display:flex;gap:8px;padding:8px;border-radius:10px;margin-bottom:6px;background:var(--bg);border-left:4px solid var(--amb)}.alert.hi{border-color:var(--bad)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.chips button{font-size:13px;border-radius:99px}
+#log{max-height:300px;overflow:auto;display:grid;gap:8px}
+.q{justify-self:end;background:var(--acc);color:#04201e;padding:6px 12px;border-radius:12px}
+.a{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:14px;margin:0}
+.a dt{font-weight:700;color:var(--acc);font-size:12px;text-transform:uppercase;margin-top:6px}.a dd{margin:0}
+.dots span{display:inline-block;width:7px;height:7px;margin:2px;border-radius:50%;background:var(--acc);animation:b 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}
+.note{font-size:12px;color:var(--mut)}.empty{color:var(--mut);text-align:center;padding:10px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s}#toast.on{opacity:1}
+@media(max-width:860px){.app{grid-template-columns:1fr}aside{position:static;height:auto;display:flex;gap:6px;overflow-x:auto;padding:10px}aside h1,aside p{display:none}aside button{white-space:nowrap;width:auto;gap:8px}.g2,.g3{grid-template-columns:1fr}}
+</style></head><body>
+<div class="app">
+<aside aria-label="Regions"><h1>Climate<span>Pulse</span></h1><p>Simulated demo data</p><nav id="nav"></nav></aside>
+<section class="main">
+<div class="top"><h2 id="title"></h2><div class="row">
+<label>Range <select id="range"><option value="7">7 days</option><option value="14">14 days</option><option value="30" selected>30 days</option></select></label>
+<button class="b" id="refresh">Refresh</button><button class="b" id="theme" aria-label="Toggle dark mode">Theme</button></div></div>
+<div class="kpis" id="kpis" aria-label="Key metrics"></div>
+<div class="g3">
+<div class="card"><div class="tabs" role="tablist" id="tabs"></div><div id="chart" role="img" aria-label="Trend chart"></div></div>
+<div class="card"><h3>Regional risk map</h3><div id="map"></div><p class="note">Click a city to select. Colour = environmental risk.</p></div></div>
+<div class="g2">
+<div class="card"><h3>Risk timeline</h3><div id="timeline" role="img" aria-label="Daily climate risk bars"></div><h3 style="margin-top:12px">Alerts</h3><div id="alerts"></div></div>
+<div class="card"><h3>Ask ClimatePulse AI</h3><div class="chips" id="chips"></div><div id="log" aria-live="polite"><p class="empty">Ask about heat, vulnerability or preparation.</p></div>
+<form class="row" id="f" style="margin-top:8px"><input id="qi" aria-label="Ask a question" placeholder="Why is the heat risk increasing?"><button class="b p">Ask</button></form></div></div>
+<div class="card"><h3>Regional comparison</h3><div class="scroll"><table><thead><tr id="th"></tr></thead><tbody id="cmp"></tbody></table></div></div>
+</section></div>
+<div id="toast" role="status"></div>
+<script>
+const R=[{n:"Chennai",x:195,y:285,t:33,r:5,a:92,h:74,w:48,f:46},{n:"Bengaluru",x:140,y:278,t:29,r:4,a:70,h:60,w:55,f:30},{n:"Hyderabad",x:155,y:215,t:34,r:3,a:88,h:52,w:60,f:28},{n:"Mumbai",x:72,y:190,t:32,r:9,a:96,h:78,w:44,f:62},{n:"Delhi",x:150,y:62,t:37,r:2,a:178,h:40,w:66,f:20}];
+const M={t:{l:"Temperature °C",u:"°C"},r:{l:"Rainfall mm",u:" mm"},a:{l:"AQI",u:""}};
+const $=id=>document.getElementById(id);let st={reg:0,days:30,m:"t",sort:"risk",desc:true};
+const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
+const rng=s=>()=>(s=s*16807%2147483647)/2147483647;
+function series(reg,days,seed=1){const g=rng(reg.n.length*977+seed),o={t:[],r:[],a:[]};
+for(let i=0;i<days;i++){const k=i/days;o.t.push(+(reg.t+2*Math.sin(i/4)+k*1.8+g()*1.2).toFixed(1));o.r.push(+(g()>.75?reg.r*(2+g()*4):g()*reg.r*.6).toFixed(1));o.a.push(Math.round(reg.a+25*Math.sin(i/5)+k*8+g()*15))}return o}
+let seed=1;const D=()=>R.map(r=>({...r,s:series(r,st.days,seed)}));
+const heat=(t,h)=>clamp(Math.round((t-28)*9+(h>70?8:0)));
+const flood=(r,f)=>clamp(Math.round(f*.5+r.slice(-7).reduce((a,b)=>a+b,0)*.5));
+function met(d){const s=d.s,l=a=>a[a.length-1],avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const hr=heat(avg(s.t.slice(-5)),d.h),fr=flood(s.r,d.f),ar=clamp(Math.round(l(s.a)/3)),wr=d.w;
+const risk=Math.round((hr*1.2+fr+ar+wr*.8)/4);return{hr,fr,ar,wr,risk,score:100-risk,t:l(s.t),aqi:l(s.a),rain:s.r.slice(-7).reduce((a,b)=>a+b,0)}}
+const col=v=>v>=55?"var(--bad)":v>=38?"var(--amb)":"var(--ok)";
+function line(vals,u){const W=560,H=180,mn=Math.min(...vals),mx=Math.max(...vals),sp=mx-mn||1,n=vals.length;
+const P=vals.map((v,i)=>[10+i*(W-20)/Math.max(n-1,1),150-(v-mn)/sp*120]);const d=P.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join("");
+const bars=st.m==="r";return`<svg viewBox="0 0 ${W} ${H}" width="100%"><title>${M[st.m].l} over ${n} days</title>`+(bars?P.map(p=>`<rect x="${p[0]-3}" y="${p[1]}" width="6" height="${160-p[1]}" fill="var(--acc)" rx="2"/>`).join(""):`<path d="${d}L${P[n-1][0]} 160L10 160Z" fill="var(--acc)" opacity=".15"/><path d="${d}" fill="none" stroke="var(--acc)" stroke-width="2.5"/>`)+`<text x="10" y="175" font-size="11" fill="var(--mut)">min ${mn}${u} · max ${mx}${u} · latest ${vals[n-1]}${u}</text></svg>`}
+function render(){const all=D(),d=all[st.reg],m=met(d);$("title").textContent=d.n+" · climate overview";
+$("nav").innerHTML=all.map((x,i)=>`<button aria-pressed="${i===st.reg}" data-i="${i}">${x.n}<span class="dot" style="background:${col(met(x).risk)}"></span></button>`).join("");
+const k=[["Climate score",m.score+"/100"],["Air quality",m.aqi+" AQI"],["Temperature",m.t+"°C"],["Rain (7d)",m.rain.toFixed(0)+" mm"],["Water stress",m.wr+"%"],["Env. risk",m.risk+"/100"]];
+$("kpis").innerHTML=k.map(a=>`<div class="card kpi"><small>${a[0]}</small><b>${a[1]}</b></div>`).join("");
+$("tabs").innerHTML=Object.keys(M).map(x=>`<button class="b" role="tab" aria-selected="${x===st.m}" data-m="${x}">${M[x].l}</button>`).join("");
+$("chart").innerHTML=line(d.s[st.m],M[st.m].u);
+$("map").innerHTML=`<svg viewBox="0 0 300 340" width="100%"><title>Simplified region map</title><path d="M150 20 L230 80 L215 170 L200 300 L170 320 L130 300 L55 200 L70 150 L110 90Z" fill="var(--line)" opacity=".7"/>`+all.map((x,i)=>{const v=met(x).risk;return`<g tabindex="0" role="button" aria-label="${x.n} risk ${v}" data-i="${i}" style="cursor:pointer"><circle cx="${x.x}" cy="${x.y}" r="${i===st.reg?15:11}" fill="${col(v)}" stroke="var(--ink)" stroke-width="${i===st.reg?3:0}"/><text x="${x.x+16}" y="${x.y+4}" font-size="11" fill="var(--ink)">${x.n}</text></g>`}).join("")+`</svg>`;
+const days=d.s.t.map((_,i)=>clamp(Math.round(heat(d.s.t[i],d.h)*.5+d.s.a[i]/6+d.w*.25)));
+$("timeline").innerHTML=`<svg viewBox="0 0 560 70" width="100%"><title>Risk timeline</title>`+days.map((v,i)=>{const w=540/days.length;return`<rect x="${10+i*w}" y="${60-v*.55}" width="${w-2}" height="${v*.55}" rx="2" fill="${col(v)}"><title>Day ${i+1}: ${v}</title></rect>`}).join("")+`</svg>`;
+const al=[];if(m.hr>=50)al.push(["hi","Heat risk "+m.hr+": limit midday outdoor work"]);if(m.fr>=45)al.push(["hi","Flood risk "+m.fr+": check drainage"]);if(m.aqi>150)al.push(["hi","Poor air (AQI "+m.aqi+"): sensitive groups stay indoors"]);else if(m.aqi>100)al.push(["","Moderate air quality (AQI "+m.aqi+")"]);if(m.wr>=60)al.push(["","Water stress "+m.wr+"%: conserve supply"]);
+$("alerts").innerHTML=al.length?al.map(a=>`<div class="alert ${a[0]}">⚠ ${a[1]}</div>`).join(""):'<p class="empty">No active alerts for this region.</p>';
+const rows=all.map(x=>({n:x.n,...met(x)})).sort((a,b)=>(a[st.sort]>b[st.sort]?1:-1)*(st.desc?-1:1));
+const cols=[["n","Region"],["t","Temp"],["aqi","AQI"],["wr","Water stress"],["risk","Risk"]];
+$("th").innerHTML=cols.map(c=>`<th><button data-s="${c[0]}">${c[1]}${st.sort===c[0]?(st.desc?" ▼":" ▲"):""}</button></th>`).join("");
+$("cmp").innerHTML=rows.map(r=>`<tr><td>${r.n}</td><td>${r.t}°C</td><td>${r.aqi}</td><td>${r.wr}%</td><td style="color:${col(r.risk)};font-weight:700">${r.risk}</td></tr>`).join("")}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove("on"),2000)}
+function answer(q){q=q.toLowerCase();const all=D(),d=all[st.reg],m=met(d),s=d.s.t,half=Math.floor(s.length/2),avg=a=>a.reduce((x,y)=>x+y,0)/a.length,dt=avg(s.slice(half))-avg(s.slice(0,half));
+if(/heat|hot|temp/.test(q))return{r:dt>0?`${d.n} is warming: the recent half runs ${dt.toFixed(1)}°C above the earlier half.`:`${d.n} temperatures are flat or falling (${dt.toFixed(1)}°C).`,e:`Latest ${m.t}°C, humidity ${d.h}%, heat risk ${m.hr}/100.`,rec:m.hr>=50?"Add shade and cooling centres; shift outdoor work to mornings.":"Monitor; no action beyond routine advisories.",c:Math.min(88,60+s.length)};
+if(/vulnerab|area|worst|region/.test(q)){const t=all.map(x=>({n:x.n,...met(x)})).sort((a,b)=>b.risk-a.risk);return{r:`${t[0].n} is the most vulnerable region (risk ${t[0].risk}).`,e:t.slice(0,3).map(x=>`${x.n} ${x.risk}`).join(", ")+` (heat/flood/air/water mix).`,rec:`Prioritise adaptation funding for ${t[0].n} and ${t[1].n}.`,c:82}}
+if(/prepare|plan|should|city/.test(q)){const o=[["heat",m.hr],["flood",m.fr],["air quality",m.ar],["water supply",m.wr]].sort((a,b)=>b[1]-a[1]);return{r:`${d.n} should prepare first for ${o[0][0]} and ${o[1][0]}.`,e:o.map(x=>x[0]+" "+x[1]).join(", "),rec:`Issue ${o[0][0]} advisories and pre-position response for ${o[1][0]}.`,c:76}}
+return{r:"I can explain heat, vulnerable areas, or what to prepare for.",e:"Try a suggested prompt.",rec:"Rephrase around one of those.",c:30}}
+function ask(q){if(!q.trim())return toast("Type a question");const l=$("log");if(l.querySelector(".empty"))l.innerHTML="";
+l.insertAdjacentHTML("beforeend",'<div class="q"></div>');l.lastChild.textContent=q;l.insertAdjacentHTML("beforeend",'<div class="a dots" id="ld"><span></span><span></span><span></span></div>');l.scrollTop=1e9;
+setTimeout(()=>{const a=answer(q);$("ld").remove();l.insertAdjacentHTML("beforeend",`<dl class="a"><dt>Reason</dt><dd>${a.r}</dd><dt>Evidence</dt><dd>${a.e}</dd><dt>Recommendation</dt><dd>${a.rec}</dd><dt>Confidence</dt><dd>${a.c}%</dd></dl>`);l.scrollTop=1e9},600)}
+$("nav").onclick=e=>{const b=e.target.closest("button");if(b){st.reg=+b.dataset.i;render()}};
+$("map").onclick=e=>{const g=e.target.closest("g");if(g){st.reg=+g.dataset.i;render()}};
+$("map").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){const g=e.target.closest("g");if(g){e.preventDefault();st.reg=+g.dataset.i;render()}}};
+$("tabs").onclick=e=>{const b=e.target.closest("button");if(b){st.m=b.dataset.m;render()}};
+$("th").onclick=e=>{const b=e.target.closest("button");if(b){st.desc=st.sort===b.dataset.s?!st.desc:true;st.sort=b.dataset.s;render()}};
+$("range").onchange=e=>{st.days=+e.target.value;$("chart").innerHTML='<div class="sk"></div>';setTimeout(render,350)};
+$("refresh").onclick=()=>{seed++;$("chart").innerHTML='<div class="sk"></div>';setTimeout(()=>{render();toast("Simulated data refreshed")},450)};
+$("chips").innerHTML=["Why is the heat risk increasing?","What areas are most vulnerable?","What should the city prepare for?"].map(c=>`<button class="b" type="button">${c}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};
+$("f").onsubmit=e=>{e.preventDefault();ask($("qi").value);$("qi").value=""};
+$("theme").onclick=()=>{const d=document.documentElement,n=(d.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark"?"light":"dark";d.dataset.theme=n;try{localStorage.setItem("cp-theme",n)}catch(e){}};
+try{const t=localStorage.getItem("cp-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+render();
+</script></body></html>

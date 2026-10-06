@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CampusIQ</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6fb;--card:#fff;--ink:#14213d;--mut:#5b6784;--line:#e2e7f2;--acc:#4f46e5;--ok:#0f9d6b;--warn:#d97706;--bad:#dc2626}
+:root:not([data-theme="light"]){}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1424;--card:#172038;--ink:#e8ecf8;--mut:#9aa6c4;--line:#27324f;--acc:#8b86ff}}
+:root[data-theme="dark"]{--bg:#0e1424;--card:#172038;--ink:#e8ecf8;--mut:#9aa6c4;--line:#27324f;--acc:#8b86ff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--line)}
+h1{font-size:20px;margin:0}h1 span{color:var(--acc)}h2{font-size:16px;margin:0 0 10px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,input,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+button{cursor:pointer;transition:.15s}button:hover{border-color:var(--acc)}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+main{max-width:1200px;margin:0 auto;padding:18px;display:grid;gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.kpi b{display:block;font-size:26px}.kpi small{color:var(--mut)}
+.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-weight:600;font-size:13px}
+td input{width:64px}
+.badge{padding:2px 8px;border-radius:99px;font-size:12px;color:#fff}
+.low{background:var(--ok)}.mid{background:var(--warn)}.high{background:var(--bad)}
+ul{list-style:none;margin:0;padding:0}li.as{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+li.done span{text-decoration:line-through;color:var(--mut)}
+form.add{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}form.add input[type=text]{grid-column:1/3}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.plan div{background:var(--bg);border-radius:10px;padding:8px;font-size:13px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.chips button{font-size:13px;border-radius:99px}
+#log{max-height:340px;overflow:auto;display:grid;gap:10px}
+.q{justify-self:end;background:var(--acc);color:#fff;padding:6px 12px;border-radius:12px}
+.a{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:14px}
+.a dt{font-weight:700;color:var(--acc);font-size:12px;text-transform:uppercase;margin-top:6px}.a dd{margin:0}
+.dots span{display:inline-block;width:7px;height:7px;margin:2px;border-radius:50%;background:var(--acc);animation:b 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;max-width:90vw}
+#toast.on{opacity:1}
+.empty,.err{color:var(--mut);padding:10px;text-align:center}.err{color:var(--bad)}
+.note{font-size:12px;color:var(--mut)}
+</style></head><body>
+<header>
+<h1>Campus<span>IQ</span> <span class="note">· demo data, simulated</span></h1>
+<div class="tools">
+<label>Semester <select id="sem"></select></label>
+<label>Target CGPA <input id="target" type="number" min="5" max="10" step="0.1" style="width:72px"></label>
+<button id="theme" aria-label="Toggle dark mode">Theme</button>
+<button id="reset" aria-label="Reset demo data">Reset</button>
+</div></header>
+<main>
+<section class="kpis" id="kpis" aria-label="Key metrics"></section>
+<div class="grid">
+<div class="card"><h2>Subjects (edit marks and attendance)</h2><div class="scroll"><table><thead><tr><th>Subject</th><th>Cr</th><th>Marks</th><th>Attend %</th><th>Hrs/wk</th><th>Risk</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p id="subErr" class="err" role="alert" hidden></p>
+<h2 style="margin-top:16px">Marks vs predicted final</h2>
+<div id="chart" role="img" aria-label="Bar chart comparing current and predicted marks per subject"></div></div>
+<div class="card"><h2>Ask CampusIQ AI</h2>
+<div class="chips" id="chips"></div>
+<div id="log" aria-live="polite"><p class="empty">Ask a question. Answers are computed from your data below.</p></div>
+<form class="row" id="askForm" style="margin-top:10px"><input id="askIn" aria-label="Ask CampusIQ" placeholder="e.g. Can I reach 9 CGPA?"><button class="p">Ask</button></form></div>
+</div>
+<div class="grid">
+<div class="card"><h2>Weekly study planner</h2><label>Hours this week <input id="hours" type="number" min="5" max="70" style="width:72px"></label> <button class="p" id="gen">Generate plan</button><div id="plan" class="plan" style="margin-top:10px"></div></div>
+<div class="card"><h2>Assignments &amp; exams</h2><ul id="asg"></ul>
+<form class="add" id="asgForm"><input type="text" id="asgT" aria-label="Assignment title" placeholder="Assignment title" required><select id="asgS" aria-label="Subject"></select><input type="date" id="asgD" aria-label="Due date" required><button class="p" style="grid-column:1/3">Add assignment</button></form></div>
+</div>
+</main>
+<div id="toast" role="status"></div>
+<script>
+const SEED={sem:5,target:9,hours:28,prev:{3:{c:20,g:8.2},4:{c:22,g:8.0}},
+subjects:{5:[{n:"Machine Learning",c:4,m:72,a:82,h:6},{n:"Operating Systems",c:4,m:58,a:68,h:4},{n:"Database Systems",c:3,m:84,a:91,h:4},{n:"Computer Networks",c:3,m:66,a:74,h:3},{n:"Software Engineering",c:3,m:88,a:93,h:3}],
+4:[{n:"Algorithms",c:4,m:80,a:88,h:5},{n:"Discrete Maths",c:4,m:70,a:80,h:4},{n:"Computer Architecture",c:3,m:76,a:85,h:3}],
+3:[{n:"Data Structures",c:4,m:86,a:90,h:5},{n:"Probability",c:3,m:74,a:81,h:3}]},
+asg:[{t:"ML mini-project report",s:"Machine Learning",d:"2026-10-12",x:false},{t:"OS scheduling lab",s:"Operating Systems",d:"2026-10-09",x:false},{t:"ER diagram design",s:"Database Systems",d:"2026-10-20",x:true},{t:"Subnetting worksheet",s:"Computer Networks",d:"2026-10-15",x:false}],
+exams:[{s:"Operating Systems",d:"Oct 28"},{s:"Machine Learning",d:"Nov 2"},{s:"Computer Networks",d:"Nov 6"}]};
+let S;const $=id=>document.getElementById(id);
+const load=()=>{try{const r=localStorage.getItem("campusiq");S=r?JSON.parse(r):structuredClone(SEED)}catch(e){S=structuredClone(SEED)}};
+const save=()=>{try{localStorage.setItem("campusiq",JSON.stringify(S))}catch(e){}};
+const toast=m=>{const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2200)};
+const gp=m=>m>=90?10:m>=80?9:m>=70?8:m>=60?7:m>=50?6:4;
+const subs=()=>S.subjects[S.sem]||[];
+const pending=s=>S.asg.filter(a=>!a.x&&a.s===s).length;
+const pred=s=>Math.max(0,Math.min(100,Math.round(s.m*.6+(s.m+(s.h-5)*1.5-(s.a<75?5:0))*.4)));
+const risk=s=>Math.min(100,Math.round((100-s.m)*.6+Math.max(0,75-s.a)*1.6+pending(s.n)*6));
+const lvl=r=>r>=40?["high","High"]:r>=22?["mid","Medium"]:["low","Low"];
+function sgpa(list,f){let c=0,w=0;list.forEach(s=>{c+=s.c;w+=s.c*gp(f(s))});return c?w/c:0}
+function cgpa(f){let c=0,w=0;Object.entries(S.prev).forEach(([k,v])=>{if(+k<S.sem){c+=v.c;w+=v.c*v.g}});subs().forEach(s=>{c+=s.c;w+=s.c*gp(f(s))});return c?w/c:0}
+function stats(){const l=subs();const att=l.length?l.reduce((a,s)=>a+s.a,0)/l.length:0;const rs=l.length?l.reduce((a,s)=>a+risk(s)*s.c,0)/l.reduce((a,s)=>a+s.c,0):0;
+return{cg:cgpa(s=>s.m),pc:cgpa(pred),att,rs:Math.round(rs),pend:S.asg.filter(a=>!a.x).length,hrs:l.reduce((a,s)=>a+s.h,0)}}
+function renderKpis(){const k=stats(),[c,t]=lvl(k.rs);
+const items=[["Current CGPA",k.cg.toFixed(2),"Target "+S.target],["Predicted CGPA",k.pc.toFixed(2),k.pc>=S.target?"On track":"Gap "+(S.target-k.pc).toFixed(2)],["Attendance",k.att.toFixed(0)+"%",k.att<75?"Below 75% rule":"Safe"],["Academic risk",k.rs+"/100",`<span class="badge ${c}">${t}</span>`],["Assignments pending",k.pend,"across subjects"],["Study hours",k.hrs+"h","per week"]];
+$("kpis").innerHTML=items.map(i=>`<div class="card kpi"><small>${i[0]}</small><b>${i[1]}</b><small>${i[2]}</small></div>`).join("")}
+function renderRows(){const l=subs();$("rows").innerHTML=l.length?l.map((s,i)=>{const [c,t]=lvl(risk(s));return`<tr><td>${s.n}</td><td>${s.c}</td><td><input type="number" min="0" max="100" value="${s.m}" data-i="${i}" data-f="m" aria-label="Marks ${s.n}"></td><td><input type="number" min="0" max="100" value="${s.a}" data-i="${i}" data-f="a" aria-label="Attendance ${s.n}"></td><td><input type="number" min="0" max="40" value="${s.h}" data-i="${i}" data-f="h" aria-label="Weekly hours ${s.n}"></td><td><span class="badge ${c}">${t}</span></td></tr>`}).join(""):`<tr><td colspan="6" class="empty">No subjects for this semester.</td></tr>`}
+function renderChart(){const l=subs();if(!l.length){$("chart").innerHTML='<p class="empty">No data to chart.</p>';return}
+const W=560,H=200,bw=W/l.length;let g="";l.forEach((s,i)=>{const x=i*bw+bw*.12,w=bw*.34,h1=s.m*1.5,h2=pred(s)*1.5;
+g+=`<rect x="${x}" y="${170-h1}" width="${w}" height="${h1}" rx="3" fill="var(--acc)"/><rect x="${x+w+3}" y="${170-h2}" width="${w}" height="${h2}" rx="3" fill="var(--ok)"/><text x="${x}" y="190" font-size="10" fill="var(--mut)">${s.n.split(" ")[0]}</text><text x="${x}" y="${164-h1}" font-size="10" fill="var(--ink)">${s.m}</text><text x="${x+w+3}" y="${164-h2}" font-size="10" fill="var(--ink)">${pred(s)}</text>`});
+$("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%"><title>Marks vs predicted</title>${g}</svg><p class="note"><span style="color:var(--acc)">■</span> Current <span style="color:var(--ok)">■</span> Predicted</p>`}
+function renderAsg(){const l=S.asg;$("asg").innerHTML=(l.length?l.map((a,i)=>`<li class="as ${a.x?"done":""}"><input type="checkbox" ${a.x?"checked":""} data-i="${i}" aria-label="Complete ${a.t}"><span style="flex:1">${a.t}<br><small class="note">${a.s} · due ${a.d}</small></span><button data-del="${i}" aria-label="Delete ${a.t}">✕</button></li>`).join(""):'<li class="empty">No assignments. Add one below.</li>')+S.exams.map(e=>`<li class="as"><span>📝 Exam: ${e.s} <small class="note">${e.d}</small></span></li>`).join("");
+$("asgS").innerHTML=subs().map(s=>`<option>${s.n}</option>`).join("")}
+function plan(){const l=subs(),H=+$("hours").value;if(!l.length)return $("plan").innerHTML='<p class="empty">No subjects.</p>';
+if(!(H>=5&&H<=70))return toast("Enter 5–70 study hours");S.hours=H;save();
+const w=l.map(s=>risk(s)+10),T=w.reduce((a,b)=>a+b,0),days=["Mon","Tue","Wed","Thu","Fri","Sat"];
+const alloc=l.map((s,i)=>({n:s.n,h:Math.round(H*w[i]/T*2)/2})).sort((a,b)=>b.h-a.h);
+$("plan").innerHTML=days.map((d,i)=>{const a=alloc[i%alloc.length],b=alloc[(i+2)%alloc.length];return`<div><b>${d}</b><br>${a.n}: ${(a.h/3).toFixed(1)}h<br>${b.n}: ${(b.h/4).toFixed(1)}h</div>`}).join("");toast("Study plan generated")}
+function answer(q){q=q.toLowerCase();const l=subs(),k=stats();if(!l.length)return null;
+const worst=[...l].sort((a,b)=>risk(b)-risk(a)),w=worst[0],low=l.filter(s=>s.a<75);let r,e,rec,cf;
+if(/focus|weak|subject/.test(q)){r=`${w.n} carries the highest risk score (${risk(w)}).`;e=`Marks ${w.m}, attendance ${w.a}%, ${pending(w.n)} pending assignment(s), ${w.h}h/week.`;rec=`Move 2–3 extra hours/week to ${w.n} and clear its assignments first.`;cf=86}
+else if(/cgpa|reach|target|\b9\b/.test(q)){const gap=S.target-k.pc;r=gap<=0?`Predicted CGPA ${k.pc.toFixed(2)} already meets ${S.target}.`:`Predicted CGPA ${k.pc.toFixed(2)} is ${gap.toFixed(2)} below target ${S.target}.`;e=`Current ${k.cg.toFixed(2)}; weakest: ${worst.slice(0,2).map(s=>s.n+" ("+s.m+")").join(", ")}.`;rec=gap<=0?"Maintain current hours.":`Lift ${w.n} above 70 and keep every subject above 75% attendance; a gap this size is ${gap>0.5?"hard":"achievable"} in one semester.`;cf=gap>0.5?64:78}
+else if(/hour|week|study/.test(q)){const need=Math.round(k.hrs*(1+k.rs/150));r=`Your current load is ${k.hrs}h; risk ${k.rs}/100 suggests more.`;e=`Risk by subject: ${worst.map(s=>s.n.split(" ")[0]+" "+risk(s)).join(", ")}.`;rec=`Aim for about ${need}h this week, weighted toward ${w.n}.`;cf=72}
+else if(/risk/.test(q)){const hi=worst.filter(s=>risk(s)>=22);r=hi.length?`${hi.length} subject(s) raise your risk to ${k.rs}/100.`:`Risk is low (${k.rs}/100).`;e=hi.map(s=>`${s.n}: ${risk(s)}`).join("; ")||"All subjects below threshold.";rec=hi.length?`Start with ${hi[0].n}; fix attendance where under 75%.`:"Keep current routine.";cf=84}
+else if(/attend|class/.test(q)){r=low.length?`${low.length} subject(s) are under 75% attendance.`:"All subjects meet 75%.";e=low.map(s=>`${s.n} ${s.a}%`).join(", ")||`Average ${k.att.toFixed(0)}%.`;rec=low.length?low.map(s=>{const n=Math.ceil((37.5-s.a/2)/.25);return `${s.n}: attend next ${n} classes in a row (assuming 50 held)`}).join("; "):"No action needed.";cf=70}
+else return{r:"I can answer on focus, CGPA target, study hours, risk and attendance.",e:"Try one of the suggested prompts.",rec:"Rephrase with one of those topics.",cf:30};
+return{r,e,rec,cf}}
+function ask(q){if(!q.trim())return toast("Type a question first");const log=$("log");if(log.querySelector(".empty"))log.innerHTML="";
+log.insertAdjacentHTML("beforeend",`<div class="q"></div>`);log.lastChild.textContent=q;
+log.insertAdjacentHTML("beforeend",`<div class="a dots" id="ld"><span></span><span></span><span></span></div>`);log.scrollTop=1e9;
+setTimeout(()=>{const a=answer(q);$("ld").remove();log.insertAdjacentHTML("beforeend",a?`<dl class="a"><dt>Reason</dt><dd>${a.r}</dd><dt>Evidence</dt><dd>${a.e}</dd><dt>Recommendation</dt><dd>${a.rec}</dd><dt>Confidence</dt><dd>${a.cf}%</dd></dl>`:`<div class="a err">No subject data for this semester.</div>`);log.scrollTop=1e9},600)}
+function renderAll(){renderKpis();renderRows();renderChart();renderAsg()}
+function init(){load();$("sem").innerHTML=Object.keys(S.subjects).sort().map(s=>`<option value="${s}">Semester ${s}</option>`).join("");$("sem").value=S.sem;$("target").value=S.target;$("hours").value=S.hours;
+$("chips").innerHTML=["Which subject should I focus on?","Can I reach 9 CGPA?","How many hours should I study this week?","Which subjects are putting my semester at risk?","Check my attendance"].map(c=>`<button type="button">${c}</button>`).join("");
+const th=localStorage.getItem("campusiq-theme");if(th)document.documentElement.dataset.theme=th;renderAll();plan()}
+$("sem").onchange=e=>{S.sem=+e.target.value;save();renderAll();plan()};
+$("target").onchange=e=>{const v=+e.target.value;if(!(v>=5&&v<=10)){e.target.value=S.target;return toast("Target must be 5–10")}S.target=v;save();renderKpis();toast("Target set to "+v)};
+$("rows").onchange=e=>{const i=e.target.dataset.i;if(i==null)return;const v=+e.target.value,f=e.target.dataset.f,max=f==="h"?40:100;
+if(e.target.value===""||!(v>=0&&v<=max)){$("subErr").hidden=false;$("subErr").textContent=`Invalid value. Enter 0–${max}.`;e.target.value=subs()[i][f];return}
+$("subErr").hidden=true;subs()[i][f]=v;save();renderAll();toast("Updated")};
+$("asg").onchange=e=>{if(e.target.dataset.i!=null){S.asg[e.target.dataset.i].x=e.target.checked;save();renderAll();toast(e.target.checked?"Marked complete":"Reopened")}};
+$("asg").onclick=e=>{const d=e.target.dataset.del;if(d!=null){S.asg.splice(d,1);save();renderAll();toast("Deleted")}};
+$("asgForm").onsubmit=e=>{e.preventDefault();const t=$("asgT").value.trim();if(!t||!$("asgS").value)return toast("Add a title and subject");S.asg.push({t,s:$("asgS").value,d:$("asgD").value,x:false});$("asgT").value="";save();renderAll();toast("Assignment added")};
+$("gen").onclick=plan;
+$("askForm").onsubmit=e=>{e.preventDefault();ask($("askIn").value);$("askIn").value=""};
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};
+$("theme").onclick=()=>{const d=document.documentElement,n=(d.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark"?"light":"dark";d.dataset.theme=n;try{localStorage.setItem("campusiq-theme",n)}catch(e){}};
+$("reset").onclick=()=>{S=structuredClone(SEED);save();init();toast("Demo data reset")};
+init();
+</script></body></html>
