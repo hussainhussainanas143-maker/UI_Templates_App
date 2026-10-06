@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MoneyPilot</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#f6f4ee;--card:#fff;--ink:#1d2b24;--mut:#68756e;--line:#e6e2d6;--acc:#15803d;--acc2:#b45309;--bad:#dc2626}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101712;--card:#18221b;--ink:#e8f1ea;--mut:#98ab9f;--line:#28372d;--acc:#4ade80;--acc2:#fbbf24}}
+:root[data-theme="dark"]{--bg:#101712;--card:#18221b;--ink:#e8f1ea;--mut:#98ab9f;--line:#28372d;--acc:#4ade80;--acc2:#fbbf24}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Georgia,"Times New Roman",serif;overflow-x:hidden}
+button,input,select,textarea{font:15px system-ui,sans-serif;color:var(--ink)}
+:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:16px 20px;max-width:1100px;margin:auto}
+h1{margin:0;font-size:24px}h1 i{color:var(--acc)}
+.nav{display:flex;gap:6px}.nav button{padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);cursor:pointer}.nav button[aria-current=true]{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+.b{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;transition:.15s}.b:hover{border-color:var(--acc)}.b.p{background:var(--acc);color:var(--bg);border-color:var(--acc);font-weight:600}
+main{max-width:1100px;margin:auto;padding:0 20px 90px;display:grid;gap:14px}
+.page[hidden]{display:none}.page{display:grid;gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.kpi small{color:var(--mut);font-family:system-ui}.kpi b{display:block;font-size:26px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}h3{margin:0 0 8px;font-size:17px}
+.bar{height:8px;border-radius:9px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--acc);transition:width .4s}.bar i.over{background:var(--bad)}
+.fr{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.fr input,.fr select,form input,form select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+.fr input{flex:1;min-width:140px}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:480px;font-family:system-ui;font-size:14px}th,td{padding:7px 6px;text-align:left;border-bottom:1px solid var(--line)}
+.neg{color:var(--bad)}.pos{color:var(--acc)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.chips button{border-radius:99px;font-size:13px}
+#log{max-height:300px;overflow:auto;display:grid;gap:8px}
+.q{justify-self:end;background:var(--acc);color:var(--bg);padding:6px 12px;border-radius:12px;font-family:system-ui}
+.a{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;font:14px system-ui;margin:0}.a dt{font-weight:700;color:var(--acc);font-size:12px;text-transform:uppercase;margin-top:6px}.a dd{margin:0}
+.dots span{display:inline-block;width:7px;height:7px;margin:2px;border-radius:50%;background:var(--acc);animation:b 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}
+form.add{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.empty,.err{color:var(--mut);text-align:center;padding:10px}.err{color:var(--bad)}
+.note{font:12px system-ui;color:var(--mut)}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);max-width:min(560px,92vw)}dialog::backdrop{background:rgba(0,0,0,.5)}pre{white-space:pre-wrap;font:13px/1.5 system-ui}
+#toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;font-family:system-ui}#toast.on{opacity:1}
+@media(max-width:760px){.g2{grid-template-columns:1fr}.nav{position:fixed;left:0;right:0;bottom:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);justify-content:space-around;z-index:5}.nav button{flex:1;border-radius:10px}}
+</style></head><body>
+<header><h1>Money<i>Pilot</i> <span class="note">demo data · educational planning, not financial advice</span></h1>
+<div class="row"><button class="b" id="report">Monthly report</button><button class="b" id="theme" aria-label="Toggle dark mode">Theme</button><button class="b" id="reset">Reset</button></div></header>
+<nav class="nav" aria-label="Sections" id="nav"></nav>
+<main>
+<div class="page" id="p-overview">
+<div class="kpis" id="kpis"></div>
+<div class="g2"><div class="card"><h3>Spending breakdown</h3><div id="donut" role="img" aria-label="Spending by category"></div></div>
+<div class="card"><h3>Monthly cash flow</h3><div id="flow" role="img" aria-label="Income vs spending by month"></div></div></div>
+<div class="g2"><div class="card"><h3>Ask MoneyPilot AI</h3><div class="chips" id="chips"></div><div id="log" aria-live="polite"><p class="empty">Ask about spending, goals, budget or subscriptions.</p></div>
+<form class="row" id="f" style="margin-top:8px"><input id="qi" aria-label="Ask a question" placeholder="Where am I overspending?" style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px"><button class="b p">Ask</button></form></div>
+<div class="card"><h3>Subscriptions</h3><div id="subs"></div></div></div></div>
+<div class="page" id="p-tx" hidden>
+<div class="card"><h3>Add expense</h3><form class="add" id="txf"><input id="txd" aria-label="Description" placeholder="Description" required><input id="txa" type="number" min="1" step="1" aria-label="Amount in rupees" placeholder="Amount ₹" required><select id="txc" aria-label="Category"></select><button class="b p">Add</button></form><p class="err" id="txe" role="alert" hidden></p></div>
+<div class="card"><div class="fr"><input id="q" type="search" aria-label="Search transactions" placeholder="Search transactions"><select id="cf" aria-label="Filter category"></select></div><div class="scroll"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th></th></tr></thead><tbody id="txb"></tbody></table></div></div></div>
+<div class="page" id="p-plan" hidden>
+<div class="g2"><div class="card"><h3>Budgets (edit limits)</h3><div id="bud"></div></div>
+<div class="card"><h3>Goals</h3><div id="goals"></div><form class="add" id="gf" style="margin-top:10px"><input id="gn" aria-label="Goal name" placeholder="Goal name" required><input id="gt" type="number" min="1" aria-label="Target amount" placeholder="Target ₹" required><input id="gs" type="number" min="0" aria-label="Saved so far" placeholder="Saved ₹"><button class="b p">Create goal</button></form></div></div></div>
+</main>
+<dialog id="dlg" aria-label="Monthly report"><pre id="rep"></pre><button class="b p" id="close">Close</button></dialog>
+<div id="toast" role="status"></div>
+<script>
+const CATS=["Rent","Food","Transport","Shopping","Entertainment","Learning","Health"];
+const SEED={income:85000,saved:60000,tx:[
+["2026-10-01","Rent – Velachery flat","Rent",22000],["2026-10-02","Swiggy dinners","Food",3200],["2026-10-02","Groceries – Big Basket","Food",5400],["2026-10-03","Metro + auto","Transport",2100],["2026-10-04","Amazon headphones","Shopping",6800],["2026-10-04","Movie + dinner","Entertainment",2400],["2026-10-05","Online ML course","Learning",3500],["2026-10-05","Pharmacy","Health",900],["2026-10-05","Zomato orders","Food",2900],["2026-10-05","Myntra sale","Shopping",4300]].map((t,i)=>({id:i+1,d:t[0],n:t[1],c:t[2],a:t[3]})),
+budget:{Rent:22000,Food:10000,Transport:4000,Shopping:6000,Entertainment:4000,Learning:5000,Health:3000},
+goals:[{n:"Laptop",t:90000,s:32000},{n:"Trip to Goa",t:40000,s:12000}],
+subs:[{n:"Netflix",a:649,u:2},{n:"Spotify",a:119,u:25},{n:"Cloud storage",a:130,u:12},{n:"Gym membership",a:1500,u:3},{n:"Coursera",a:3000,u:1}],
+hist:[["May",85000,61000],["Jun",85000,64000],["Jul",85000,58000],["Aug",85000,67000],["Sep",85000,63000]]};
+let S,tab="overview";const $=id=>document.getElementById(id),inr=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const load=()=>{try{S=JSON.parse(localStorage.getItem("moneypilot"))||structuredClone(SEED)}catch(e){S=structuredClone(SEED)}};
+const save=()=>{try{localStorage.setItem("moneypilot",JSON.stringify(S))}catch(e){}};
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove("on"),2000)}
+const spent=()=>S.tx.reduce((a,t)=>a+t.a,0);
+const byCat=()=>CATS.map(c=>({c,v:S.tx.filter(t=>t.c===c).reduce((a,t)=>a+t.a,0),b:S.budget[c]||0}));
+const subTotal=()=>S.subs.reduce((a,s)=>a+s.a,0);
+function kpis(){const sp=spent()+subTotal(),rem=Object.values(S.budget).reduce((a,b)=>a+b,0)-spent(),rate=Math.round((S.income-sp)/S.income*100),g=S.goals.length?Math.round(S.goals.reduce((a,g)=>a+g.s/g.t,0)/S.goals.length*100):0;
+const k=[["Monthly income",inr(S.income)],["Monthly spending",inr(sp)],["Savings rate",rate+"%"],["Remaining budget",inr(rem)],["Emergency fund",(S.saved/(sp||1)).toFixed(1)+" months"],["Goal progress",g+"%"]];
+$("kpis").innerHTML=k.map(a=>`<div class="card kpi"><small>${a[0]}</small><b${a[0]==="Remaining budget"&&rem<0?' class="neg"':""}>${a[1]}</b></div>`).join("")}
+function donut(){const d=byCat().filter(x=>x.v>0),T=d.reduce((a,x)=>a+x.v,0);if(!T)return $("donut").innerHTML='<p class="empty">No expenses yet.</p>';
+const cols=["#15803d","#b45309","#0e7490","#7c3aed","#be123c","#4d7c0f","#475569"];let a0=-Math.PI/2,p="";const R=70,r=44;
+d.forEach((x,i)=>{const a1=a0+x.v/T*Math.PI*2-.001,L=a1-a0>Math.PI?1:0,P=(q,rr)=>[100+rr*Math.cos(q),100+rr*Math.sin(q)];const[A,B,C,D]=[P(a0,R),P(a1,R),P(a1,r),P(a0,r)];
+p+=`<path d="M${A}A${R} ${R} 0 ${L} 1 ${B}L${C}A${r} ${r} 0 ${L} 0 ${D}Z" fill="${cols[CATS.indexOf(x.c)]}"><title>${x.c}: ${inr(x.v)}</title></path>`;a0=a1});
+$("donut").innerHTML=`<div class="row" style="align-items:center;flex-wrap:wrap"><svg viewBox="0 0 200 200" width="170"><title>Spending breakdown</title>${p}<text x="100" y="105" text-anchor="middle" font-size="14" fill="var(--ink)">${inr(T)}</text></svg><ul style="list-style:none;padding:0;margin:0;font:13px system-ui">${d.map(x=>`<li><span style="color:${cols[CATS.indexOf(x.c)]}">●</span> ${x.c} ${Math.round(x.v/T*100)}%</li>`).join("")}</ul></div>`}
+function flow(){const h=[...S.hist,["Oct",S.income,spent()+subTotal()]],mx=Math.max(...h.map(x=>x[1]));
+$("flow").innerHTML=`<svg viewBox="0 0 360 170" width="100%"><title>Cash flow</title>`+h.map((x,i)=>{const X=12+i*58;return`<rect x="${X}" y="${140-x[1]/mx*110}" width="20" height="${x[1]/mx*110}" fill="var(--line)" rx="3"/><rect x="${X+22}" y="${140-x[2]/mx*110}" width="20" height="${x[2]/mx*110}" fill="var(--acc)" rx="3"><title>${x[0]} spent ${inr(x[2])}</title></rect><text x="${X+10}" y="158" font-size="11" fill="var(--mut)">${x[0]}</text>`}).join("")+`</svg><p class="note">Grey = income, green = spending. Savings trend: ${h.map(x=>Math.round((x[1]-x[2])/1000)+"k").join(" → ")}</p>`}
+function subs(){$("subs").innerHTML=S.subs.length?S.subs.map((s,i)=>`<div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span>${s.n} <small class="note">${s.u} uses/mo${s.u<4?" · review":""}</small></span><span>${inr(s.a)} <button class="b" data-cancel="${i}" aria-label="Cancel ${s.n}">Cancel</button></span></div>`).join(""):'<p class="empty">No subscriptions.</p>'}
+function tx(){const q=$("q").value.trim().toLowerCase(),c=$("cf").value;const l=S.tx.filter(t=>(!q||t.n.toLowerCase().includes(q))&&(c==="All"||t.c===c)).sort((a,b)=>b.d.localeCompare(a.d)||b.id-a.id);
+$("txb").innerHTML=l.length?l.map(t=>`<tr><td>${t.d}</td><td>${t.n}</td><td>${t.c}</td><td class="neg">−${inr(t.a)}</td><td><button class="b" data-del="${t.id}" aria-label="Delete ${t.n}">✕</button></td></tr>`).join(""):'<tr><td colspan="5" class="empty">No transactions match.</td></tr>'}
+function plan(){$("bud").innerHTML=byCat().map(x=>{const p=x.b?Math.min(100,x.v/x.b*100):0;return`<div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><label for="b-${x.c}">${x.c} · ${inr(x.v)} spent</label><input id="b-${x.c}" data-bud="${x.c}" type="number" min="0" value="${x.b}" style="width:90px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px 6px"></div><div class="bar"><i class="${x.v>x.b?"over":""}" style="width:${p}%"></i></div></div>`}).join("");
+$("goals").innerHTML=S.goals.length?S.goals.map((g,i)=>`<div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><b>${g.n}</b><span>${inr(g.s)} / ${inr(g.t)}</span></div><div class="bar"><i style="width:${Math.min(100,g.s/g.t*100)}%"></i></div><div class="row" style="margin-top:4px"><button class="b" data-add="${i}">+ ₹5,000</button><button class="b" data-gdel="${i}" aria-label="Delete ${g.n}">Delete</button></div></div>`).join(""):'<p class="empty">No goals yet. Create one below.</p>'}
+function answer(q){q=q.toLowerCase();const cs=byCat(),over=cs.filter(x=>x.v>x.b).sort((a,b)=>(b.v-b.b)-(a.v-a.b)),save=Math.max(1,S.income-spent()-subTotal());
+if(/overspend|over|spend/.test(q))return over.length?{r:`You exceeded budget in ${over.length} categor${over.length>1?"ies":"y"}; ${over[0].c} is worst by ${inr(over[0].v-over[0].b)}.`,e:over.map(x=>`${x.c}: ${inr(x.v)} vs ${inr(x.b)}`).join("; "),rec:`Cap ${over[0].c} at its limit for the rest of the month; review the top 3 transactions there.`,c:90}:{r:"No category is over budget.",e:`Spending ${inr(spent())} within limits.`,rec:"Consider moving surplus into a goal.",c:85};
+if(/laptop|goal|how long/.test(q)){const g=S.goals.find(g=>q.includes(g.n.toLowerCase()))||S.goals[0];if(!g)return{r:"You have no goals yet.",e:"Goal list is empty.",rec:"Create a goal on the Budget & Goals tab.",c:50};const m=Math.ceil((g.t-g.s)/save);return{r:`${g.n} needs ${inr(g.t-g.s)} more; about ${m} month(s) at your current surplus.`,e:`Surplus ≈ ${inr(save)}/month after spending and subscriptions.`,rec:`Auto-transfer ${inr(Math.round(save*.5))} monthly to cut time to ~${Math.ceil((g.t-g.s)/(save*.5+1))} months only if surplus allows.`,c:75}}
+if(/budget|create/.test(q)){const n=S.income*.5,w=S.income*.3,s=S.income*.2;return{r:"A 50/30/20 split suits your income.",e:`Needs ${inr(n)}, wants ${inr(w)}, savings ${inr(s)} versus your actual spend ${inr(spent()+subTotal())}.`,rec:"Needs (rent, food, transport, health) up to "+inr(n)+"; keep shopping and entertainment under "+inr(w)+".",c:72}}
+if(/subscri/.test(q)){const l=S.subs.filter(s=>s.u<4);return l.length?{r:`${l.length} subscription(s) are barely used.`,e:l.map(s=>`${s.n}: ${s.u} uses/mo, ${inr(s.a)}`).join("; "),rec:`Cancelling saves ${inr(l.reduce((a,s)=>a+s.a,0))}/month.`,c:88}:{r:"All subscriptions look well used.",e:"Each has 4+ uses/month.",rec:"No action.",c:80}}
+return{r:"I can help with overspending, goals, budgets and subscriptions.",e:"Try a suggested prompt.",rec:"Rephrase around one of those.",c:30}}
+function ask(q){if(!q.trim())return toast("Type a question");const l=$("log");if(l.querySelector(".empty"))l.innerHTML="";l.insertAdjacentHTML("beforeend",'<div class="q"></div>');l.lastChild.textContent=q;l.insertAdjacentHTML("beforeend",'<div class="a dots" id="ld"><span></span><span></span><span></span></div>');l.scrollTop=1e9;
+setTimeout(()=>{const a=answer(q);$("ld").remove();l.insertAdjacentHTML("beforeend",`<dl class="a"><dt>Reason</dt><dd>${a.r}</dd><dt>Evidence</dt><dd>${a.e}</dd><dt>Recommendation</dt><dd>${a.rec}</dd><dt>Confidence</dt><dd>${a.c}%</dd></dl>`);l.scrollTop=1e9},600)}
+function all(){kpis();donut();flow();subs();tx();plan()}
+function show(t){tab=t;["overview","tx","plan"].forEach(x=>$("p-"+x).hidden=x!==t);$("nav").innerHTML=[["overview","Overview"],["tx","Transactions"],["plan","Budget & Goals"]].map(x=>`<button data-t="${x[0]}" ${x[0]===t?'aria-current="true"':""}>${x[1]}</button>`).join("")}
+$("nav").onclick=e=>{const b=e.target.closest("button");if(b)show(b.dataset.t)};
+$("txf").onsubmit=e=>{e.preventDefault();const a=+$("txa").value,n=$("txd").value.trim(),er=$("txe");if(!n||!(a>0)){er.hidden=false;er.textContent="Enter a description and an amount above 0.";return}er.hidden=true;S.tx.push({id:Date.now(),d:"2026-10-05",n,c:$("txc").value,a});$("txd").value=$("txa").value="";save();all();toast("Expense added")};
+$("txb").onclick=e=>{const d=e.target.dataset.del;if(d){S.tx=S.tx.filter(t=>t.id!=d);save();all();toast("Deleted")}};
+$("q").oninput=tx;$("cf").onchange=tx;
+$("bud").onchange=e=>{const c=e.target.dataset.bud;if(!c)return;const v=+e.target.value;if(!(v>=0)){e.target.value=S.budget[c];return toast("Invalid budget")}S.budget[c]=v;save();all();toast(c+" budget updated")};
+$("goals").onclick=e=>{const a=e.target.dataset.add,d=e.target.dataset.gdel;if(a!=null){S.goals[a].s=Math.min(S.goals[a].t,S.goals[a].s+5000);save();all();toast("Added ₹5,000")}if(d!=null){S.goals.splice(d,1);save();all()}};
+$("gf").onsubmit=e=>{e.preventDefault();const t=+$("gt").value;if(!$("gn").value.trim()||!(t>0))return toast("Name and target required");S.goals.push({n:$("gn").value.trim(),t,s:+$("gs").value||0});$("gn").value=$("gt").value=$("gs").value="";save();all();toast("Goal created")};
+$("subs").onclick=e=>{const c=e.target.dataset.cancel;if(c!=null){const s=S.subs.splice(c,1)[0];save();all();toast("Cancelled "+s.n)}};
+$("chips").innerHTML=["Where am I overspending?","How long will it take to reach my laptop goal?","Create a monthly budget.","Which subscriptions should I review?"].map(c=>`<button class="b" type="button">${c}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};
+$("f").onsubmit=e=>{e.preventDefault();ask($("qi").value);$("qi").value=""};
+$("report").onclick=()=>{const cs=byCat().filter(x=>x.v),top=[...cs].sort((a,b)=>b.v-a.v)[0];$("rep").textContent=`MoneyPilot report · October 2026 (demo data)\n\nIncome: ${inr(S.income)}\nSpending: ${inr(spent()+subTotal())} (incl. subscriptions ${inr(subTotal())})\nSavings rate: ${Math.round((S.income-spent()-subTotal())/S.income*100)}%\nTop category: ${top?top.c+" "+inr(top.v):"none"}\nOver budget: ${cs.filter(x=>x.v>x.b).map(x=>x.c).join(", ")||"none"}\nGoals: ${S.goals.map(g=>g.n+" "+Math.round(g.s/g.t*100)+"%").join(", ")||"none"}\n\nEducational summary only, not financial advice.`;$("dlg").showModal()};
+$("close").onclick=()=>$("dlg").close();
+$("theme").onclick=()=>{const d=document.documentElement,n=(d.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark"?"light":"dark";d.dataset.theme=n;try{localStorage.setItem("mp-theme",n)}catch(e){}};
+$("reset").onclick=()=>{S=structuredClone(SEED);save();all();toast("Demo data reset")};
+try{const t=localStorage.getItem("mp-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+load();$("txc").innerHTML=CATS.map(c=>`<option>${c}</option>`).join("");$("cf").innerHTML="<option>All</option>"+CATS.map(c=>`<option>${c}</option>`).join("");show("overview");all();
+</script></body></html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FitSense</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#0f1115;--card:#181b22;--ink:#f1f3f7;--mut:#99a1b3;--line:#272b36;--acc:#ff5a4f;--c2:#22d3ee;--c3:#a3e635}
+:root[data-theme="light"]{--bg:#f6f4f2;--card:#fff;--ink:#1a1c22;--mut:#667085;--line:#e6e2dd;--acc:#e8392e;--c2:#0891b2;--c3:#65a30d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:16px 20px;max-width:1150px;margin:auto}
+h1{margin:0;font-size:24px;letter-spacing:-.5px}h1 i{color:var(--acc);font-style:normal}
+button,input,select{font:inherit;color:var(--ink)}
+.b,input,select{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 12px}
+.b{cursor:pointer;transition:.15s}.b:hover{border-color:var(--acc);transform:translateY(-1px)}.b.p{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+main{max-width:1150px;margin:auto;padding:0 20px 30px;display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0}
+h2{margin:0 0 8px;font-size:15px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.hero{display:grid;grid-template-columns:260px 1fr;gap:14px}
+.rings{display:flex;justify-content:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;align-content:start}
+.stat small{color:var(--mut)}.stat b{display:block;font-size:24px}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.g3{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.tabs button[aria-selected=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.cal div{aspect-ratio:1;border-radius:7px;display:grid;place-items:center;font-size:11px;color:var(--mut);background:var(--line)}
+.dn{font-size:11px;text-align:center;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:6px;text-align:left;border-bottom:1px solid var(--line)}th{color:var(--mut)}
+.up{color:var(--c3)}.dn2{color:var(--acc)}
+form.add{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.scroll{overflow-x:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.chips button{border-radius:99px;font-size:13px}
+#log{max-height:320px;overflow:auto;display:grid;gap:8px}
+.q{justify-self:end;background:var(--acc);color:#fff;padding:6px 12px;border-radius:12px}
+.a{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:14px;margin:0}.a dt{font-weight:700;color:var(--c2);font-size:12px;text-transform:uppercase;margin-top:6px}.a dd{margin:0}
+.dots span{display:inline-block;width:7px;height:7px;margin:2px;border-radius:50%;background:var(--acc);animation:b 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.4}}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0}
+.empty{color:var(--mut);text-align:center;padding:10px}.err{color:var(--acc);font-size:13px}.note{font-size:12px;color:var(--mut)}
+.pbar{height:8px;background:var(--line);border-radius:9px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--c3);transition:width .4s}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s}#toast.on{opacity:1}
+@media(max-width:820px){.hero,.g3,.g2{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Fit<i>Sense</i> <span class="note">· demo data · general wellness, not medical advice</span></h1>
+<div class="row"><button class="b" id="theme" aria-label="Toggle light or dark mode">Theme</button><button class="b" id="reset">Reset</button></div></header>
+<main>
+<section class="hero">
+<div class="card rings" id="rings" role="img" aria-label="Today's activity rings"></div>
+<div class="card"><h2>Today · Mon 5 Oct</h2><div class="stats" id="stats"></div>
+<div class="quick"><button class="b" id="addSteps">+1,000 steps</button><button class="b" id="addWater">+250 ml water</button><button class="b" id="sleepBtn">Log sleep…</button></div></div>
+</section>
+<div class="g3">
+<div class="card"><div class="tabs" role="tablist" id="tabs"></div><div id="chart" role="img" aria-label="Activity chart"></div></div>
+<div class="card"><h2>Last 28 days</h2><div class="cal" id="cal"></div><p class="note">Brighter = more workout minutes. Hover for details.</p></div>
+</div>
+<div class="g2">
+<div class="card"><h2>Log workout</h2><form class="add" id="wf"><select id="wt" aria-label="Workout type"><option>Run</option><option>Strength</option><option>Cycling</option><option>Yoga</option><option>HIIT</option><option>Walk</option></select><input id="wm" type="number" min="5" max="240" placeholder="Minutes" aria-label="Duration in minutes" required><select id="wi" aria-label="Intensity"><option value="1">Light</option><option value="2" selected>Moderate</option><option value="3">Hard</option></select><button class="b p">Log</button></form><p class="err" id="we" role="alert" hidden></p>
+<div class="scroll"><table style="margin-top:8px"><thead><tr><th>Date</th><th>Type</th><th>Min</th><th>kcal</th><th></th></tr></thead><tbody id="wl"></tbody></table></div></div>
+<div class="card"><h2>Goals</h2><form class="add" id="gf"><label class="note">Daily steps<input id="gs" type="number" min="1000" max="30000" step="500"></label><label class="note">Sleep hrs<input id="gsl" type="number" min="4" max="12" step="0.5"></label><label class="note">Workouts/wk<input id="gw" type="number" min="1" max="7"></label><button class="b p" style="align-self:end">Save goals</button></form><p class="err" id="ge" role="alert" hidden></p>
+<h2 style="margin-top:14px">This week vs last week</h2><table><thead><tr><th>Metric</th><th>Last</th><th>This</th><th>Δ</th></tr></thead><tbody id="cmp"></tbody></table></div>
+</div>
+<div class="card"><h2>Ask FitSense coach</h2><div class="chips" id="chips"></div><div id="log" aria-live="polite"><p class="empty">Ask for today's workout, a plan or why activity changed.</p></div>
+<form class="row" id="f" style="margin-top:8px"><input id="qi" aria-label="Ask the coach" placeholder="What workout should I do today?"><button class="b p">Ask</button></form></div>
+</main><div id="toast" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);const TODAY=27;const NAMES=["Tue","Wed","Thu","Fri","Sat","Sun","Mon"];
+const seed=()=>{let s=7;const g=()=>(s=s*16807%2147483647)/2147483647;const days=[],wk=[];const types=["Run","Strength","Cycling","Yoga","HIIT"];
+for(let i=0;i<28;i++){const lastWeek=i>=21;const base=lastWeek?5200:8200;days.push({steps:Math.round(base+g()*2800),sleep:+((lastWeek?6:7.1)+g()*1.1).toFixed(1),water:Math.round(1600+g()*1200)});
+if(!lastWeek&&g()>.35||lastWeek&&g()>.7){const t=types[Math.floor(g()*5)],m=Math.round(25+g()*35);wk.push({id:i+1,i,t,m,k:Math.round(m*(t==="HIIT"?10:t==="Yoga"?4:7))})}}
+days[27]={steps:3400,sleep:6.6,water:750};return{days,wk,goal:{steps:8000,sleep:7.5,wk:4}}};
+let S;const load=()=>{try{S=JSON.parse(localStorage.getItem("fitsense"))||seed()}catch(e){S=seed()}};const save=()=>{try{localStorage.setItem("fitsense",JSON.stringify(S))}catch(e){}};
+let met="steps",range=14;
+const dayMin=i=>S.wk.filter(w=>w.i===i).reduce((a,w)=>a+w.m,0),dayKcal=i=>S.wk.filter(w=>w.i===i).reduce((a,w)=>a+w.k,0);
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
+const val=(m,i)=>m==="steps"?S.days[i].steps:m==="sleep"?S.days[i].sleep:dayMin(i);
+const week=o=>{const r=[...Array(7)].map((_,k)=>27-o*7-k);return{steps:avg(r.map(i=>S.days[i].steps)),sleep:avg(r.map(i=>S.days[i].sleep)),wk:S.wk.filter(w=>r.includes(w.i)).length,min:r.reduce((a,i)=>a+dayMin(i),0)}};
+const streak=()=>{let n=0;for(let i=TODAY;i>=0&&dayMin(i)>0;i--)n++;if(!n&&dayMin(TODAY)===0){for(let i=TODAY-1;i>=0&&dayMin(i)>0;i--)n++}return n};
+const recovery=()=>{const sl=avg([25,26,27].map(i=>S.days[i].sleep)),load=avg([25,26,27].map(dayMin));return Math.round(clamp(sl/S.goal.sleep*65+(35-clamp(load,0,70)/2)))};
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove("on"),2000)}
+function ring(r,p,c){const C=2*Math.PI*r;return`<circle cx="100" cy="100" r="${r}" fill="none" stroke="var(--line)" stroke-width="13"/><circle cx="100" cy="100" r="${r}" fill="none" stroke="${c}" stroke-width="13" stroke-linecap="round" stroke-dasharray="${C*clamp(p,0,100)/100} ${C}" transform="rotate(-90 100 100)" style="transition:stroke-dasharray .6s"/>`}
+function top(){const d=S.days[TODAY],p1=d.steps/S.goal.steps*100,p2=dayMin(TODAY)/30*100,p3=d.water/2500*100;
+$("rings").innerHTML=`<svg viewBox="0 0 200 200" width="220"><title>Steps ${Math.round(p1)}%, active minutes ${Math.round(p2)}%, water ${Math.round(p3)}%</title>${ring(88,p1,"var(--acc)")}${ring(68,p2,"var(--c3)")}${ring(48,p3,"var(--c2)")}<text x="100" y="98" text-anchor="middle" font-size="22" font-weight="700" fill="var(--ink)">${d.steps.toLocaleString("en-IN")}</text><text x="100" y="116" text-anchor="middle" font-size="11" fill="var(--mut)">steps</text></svg>`;
+const rc=recovery();$("stats").innerHTML=[["Steps",d.steps.toLocaleString("en-IN")+" / "+S.goal.steps.toLocaleString("en-IN")],["Active min",dayMin(TODAY)+" / 30"],["Calories burned",dayKcal(TODAY)+" kcal"],["Water",d.water+" / 2500 ml"],["Last sleep",d.sleep+" h"],["Workout streak",streak()+" days"],["Recovery",rc+"/100 · "+(rc>=70?"Ready":rc>=50?"Moderate":"Take it easy")]].map(x=>`<div class="stat"><small>${x[0]}</small><b style="font-size:19px">${x[1]}</b></div>`).join("")}
+function chart(){const n=range,idx=[...Array(n)].map((_,k)=>TODAY-n+1+k),v=idx.map(i=>val(met,i)),mx=Math.max(...v,1),W=560,u=met==="steps"?"":met==="sleep"?" h":" min";
+$("tabs").innerHTML=[["steps","Steps"],["sleep","Sleep"],["min","Workout min"]].map(x=>`<button class="b" role="tab" aria-selected="${x[0]===met}" data-m="${x[0]}">${x[1]}</button>`).join("")+`<select id="rg" aria-label="Range"><option value="7"${n===7?" selected":""}>7 days</option><option value="14"${n===14?" selected":""}>14 days</option><option value="28"${n===28?" selected":""}>28 days</option></select>`;
+const goal=met==="steps"?S.goal.steps:met==="sleep"?S.goal.sleep:null,bw=W/n;
+$("chart").innerHTML=`<svg viewBox="0 0 ${W} 190" width="100%"><title>${met} over ${n} days</title>`+v.map((x,i)=>{const h=x/mx*140;return`<rect x="${i*bw+2}" y="${160-h}" width="${bw-4}" height="${h}" rx="4" fill="${goal&&x>=goal?"var(--c3)":"var(--acc)"}"><title>${x}${u}</title></rect>`}).join("")+(goal?`<line x1="0" x2="${W}" y1="${160-goal/mx*140}" y2="${160-goal/mx*140}" stroke="var(--c2)" stroke-dasharray="5 4"/>`:"")+`<text x="0" y="182" font-size="11" fill="var(--mut)">avg ${avg(v).toFixed(met==="sleep"?1:0)}${u}${goal?" · goal line dashed":""}</text></svg>`}
+function cal(){$("cal").innerHTML=[...Array(28)].map((_,i)=>{const m=dayMin(i),a=m?Math.min(1,.3+m/90):0;return`<div style="${m?`background:color-mix(in srgb,var(--acc) ${Math.round(a*100)}%,var(--line));color:#fff`:""}" title="Day ${i+1}: ${m} min, ${S.days[i].steps} steps">${i===TODAY?"●":""}</div>`}).join("")}
+function lists(){const l=[...S.wk].sort((a,b)=>b.i-a.i).slice(0,6);$("wl").innerHTML=l.length?l.map(w=>`<tr><td>${w.i===TODAY?"Today":Math.abs(TODAY-w.i)+"d ago"}</td><td>${w.t}</td><td>${w.m}</td><td>${w.k}</td><td><button class="b" data-del="${w.id}" aria-label="Delete ${w.t}">✕</button></td></tr>`).join(""):'<tr><td colspan="5" class="empty">No workouts logged yet.</td></tr>';
+const a=week(1),b=week(0),row=(n,x,y,f=v=>Math.round(v))=>{const d=x?Math.round((y-x)/x*100):0;return`<tr><td>${n}</td><td>${f(x)}</td><td>${f(y)}</td><td class="${d>=0?"up":"dn2"}">${d>=0?"▲":"▼"} ${Math.abs(d)}%</td></tr>`};
+$("cmp").innerHTML=row("Avg steps",a.steps,b.steps)+row("Workouts",a.wk,b.wk)+row("Avg sleep h",a.sleep,b.sleep,v=>v.toFixed(1));$("gs").value=S.goal.steps;$("gsl").value=S.goal.sleep;$("gw").value=S.goal.wk}
+function answer(q){q=q.toLowerCase();const a=week(1),b=week(0),rc=recovery(),wk=b.wk;
+if(/today|what workout/.test(q)){const t=rc>=70?"a 40-min moderate run or strength session":rc>=50?"a 30-min easy ride or brisk walk with mobility work":"light yoga or a 20-min walk";return{r:`Recovery is ${rc}/100, so ${t} fits today.`,e:`Sleep last night ${S.days[TODAY].sleep}h (goal ${S.goal.sleep}h); ${wk}/${S.goal.wk} workouts this week.`,rec:`Do ${t}; stop if anything feels sharp or painful.`,c:74}}
+if(/why|decreas|drop|lower/.test(q)){const d=Math.round((b.steps-a.steps)/a.steps*100);return{r:d<0?`Steps fell ${Math.abs(d)}% versus last week.`:`Activity is up ${d}% versus last week.`,e:`Avg steps ${Math.round(a.steps)} → ${Math.round(b.steps)}; workouts ${a.wk} → ${b.wk}; sleep ${a.sleep.toFixed(1)}h → ${b.sleep.toFixed(1)}h.`,rec:d<0?"Add a 15-min walk after lunch and book two fixed workout slots this week.":"Keep the routine and protect sleep.",c:82}}
+if(/plan|5-day|beginner/.test(q))return{r:"A 5-day beginner plan balancing effort and rest.",e:`Based on your goal of ${S.goal.wk} workouts/week and recovery ${rc}.`,rec:"Mon: 30-min brisk walk · Tue: bodyweight squats, push-ups, planks (20 min) · Wed: rest or yoga · Thu: easy jog/walk intervals (25 min) · Fri: full-body strength (25 min). Progress time by 5 minutes a week.",c:70};
+if(/progress|goal/.test(q)){const p=Math.round(wk/S.goal.wk*100),sp=Math.round(S.days[TODAY].steps/S.goal.steps*100);return{r:`You are at ${p}% of your weekly workout goal.`,e:`${wk}/${S.goal.wk} workouts, streak ${streak()} days, today's steps ${sp}% of goal.`,rec:p<100?`Log ${S.goal.wk-wk} more session(s) before Sunday.`:"Goal met: consider raising the target slightly.",c:88}}
+return{r:"I can suggest today's workout, explain activity changes, build a plan or review progress.",e:"Try a suggested prompt.",rec:"Rephrase around one of those.",c:30}}
+function ask(q){if(!q.trim())return toast("Type a question");const l=$("log");if(l.querySelector(".empty"))l.innerHTML="";l.insertAdjacentHTML("beforeend",'<div class="q"></div>');l.lastChild.textContent=q;l.insertAdjacentHTML("beforeend",'<div class="a dots" id="ld"><span></span><span></span><span></span></div>');l.scrollTop=1e9;
+setTimeout(()=>{const a=answer(q);$("ld").remove();l.insertAdjacentHTML("beforeend",`<dl class="a"><dt>Reason</dt><dd>${a.r}</dd><dt>Evidence</dt><dd>${a.e}</dd><dt>Recommendation</dt><dd>${a.rec}</dd><dt>Confidence</dt><dd>${a.c}%</dd></dl>`);l.scrollTop=1e9},600)}
+const all=()=>{top();chart();cal();lists()};
+$("tabs").onclick=e=>{const b=e.target.closest("button");if(b){met=b.dataset.m;chart()}};$("tabs").onchange=e=>{if(e.target.id==="rg"){range=+e.target.value;chart()}};
+$("addSteps").onclick=()=>{S.days[TODAY].steps+=1000;save();all();toast("+1,000 steps")};$("addWater").onclick=()=>{S.days[TODAY].water+=250;save();all();toast("+250 ml")};
+$("sleepBtn").onclick=()=>{const v=parseFloat(prompt("Hours slept last night (3–14):",S.days[TODAY].sleep));if(isNaN(v))return;if(v<3||v>14)return toast("Enter 3–14 hours");S.days[TODAY].sleep=v;save();all();toast("Sleep logged")};
+$("wf").onsubmit=e=>{e.preventDefault();const m=+$("wm").value,er=$("we");if(!(m>=5&&m<=240)){er.hidden=false;er.textContent="Enter 5–240 minutes.";return}er.hidden=true;const t=$("wt").value,k=Math.round(m*(t==="HIIT"?10:t==="Yoga"?4:7)*(.8+$("wi").value*.2));S.wk.push({id:Date.now(),i:TODAY,t,m,k});$("wm").value="";save();all();toast(t+" logged");};
+$("wl").onclick=e=>{const d=e.target.dataset.del;if(d){S.wk=S.wk.filter(w=>w.id!=d);save();all();toast("Deleted")}};
+$("gf").onsubmit=e=>{e.preventDefault();const s=+$("gs").value,sl=+$("gsl").value,w=+$("gw").value,er=$("ge");if(!(s>=1000&&s<=30000&&sl>=4&&sl<=12&&w>=1&&w<=7)){er.hidden=false;er.textContent="Check ranges: steps 1,000–30,000, sleep 4–12 h, workouts 1–7.";return}er.hidden=true;S.goal={steps:s,sleep:sl,wk:w};save();all();toast("Goals saved")};
+$("chips").innerHTML=["What workout should I do today?","Why did my activity decrease?","Create a 5-day beginner workout plan.","How am I progressing toward my goal?"].map(c=>`<button class="b" type="button">${c}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)};$("f").onsubmit=e=>{e.preventDefault();ask($("qi").value);$("qi").value=""};
+$("theme").onclick=()=>{const d=document.documentElement,n=d.dataset.theme==="light"?"dark":"light";d.dataset.theme=n;try{localStorage.setItem("fs-theme",n)}catch(e){}};
+$("reset").onclick=()=>{S=seed();save();all();toast("Demo data reset")};
+try{const t=localStorage.getItem("fs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+load();all();
+</script></body></html>
