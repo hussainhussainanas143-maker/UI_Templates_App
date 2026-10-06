@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SpaceOps - Mission Control</title><style>:root{--bg:#050a14;--p:#0b1626;--line:#1b3350;--cy:#35e0ff;--gr:#3ddc84;--am:#ffb020;--rd:#ff4d6d;--tx:#d9e8f7;--mut:#7f98b3}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#0e2038,var(--bg) 60%);color:var(--tx);font:15px/1.45 "Segoe UI",system-ui,sans-serif;min-height:100vh;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+h1,h2{margin:0;font-family:"Bahnschrift","Arial Narrow",sans-serif;letter-spacing:.05em}h1{font-size:1.5rem;text-shadow:0 0 12px var(--cy)}h1 small{color:var(--cy);font-size:.8rem}h2{font-size:.95rem;color:var(--cy);margin-bottom:8px}
+:focus-visible{outline:3px solid var(--am);outline-offset:2px}
+.boot{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:9;color:var(--cy);font-size:1.2rem;transition:opacity .6s}.boot.err{color:var(--rd)}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--line)}.sim{background:var(--am);color:#241800;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:3px}.met{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--cy)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding:12px 20px}.k{background:var(--p);border:1px solid var(--line);padding:8px 12px;border-radius:6px}.k b{display:block;font-size:1.5rem;font-variant-numeric:tabular-nums;text-shadow:0 0 10px currentColor}.k span{font-size:.75rem;color:var(--mut)}
+.ok{color:var(--gr)}.wa{color:var(--am)}.al{color:var(--rd)}
+main{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 20px 20px}.p{background:var(--p);border:1px solid var(--line);border-radius:8px;padding:12px;min-width:0}.wide{grid-column:1/-1}
+svg{width:100%;height:auto;background:#060d1a;border-radius:6px}.note{font-size:.8rem;color:var(--mut);margin:6px 0 0}
+.ch span{font-size:.78rem;color:var(--mut)}canvas{width:100%;height:auto;display:block;margin-bottom:6px}
+.subs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.s{border:1px solid var(--line);border-radius:6px;padding:8px}.s b{display:block}.s i{display:block;height:5px;border-radius:3px;margin-top:4px;background:currentColor;transition:width .6s}
+.log{list-style:none;margin:0;padding:0;max-height:210px;overflow:auto;font-size:.85rem}.log li{padding:4px 8px;border-left:3px solid var(--am);margin-bottom:4px;background:#07101d;animation:in .3s}.log li.r{border-color:var(--rd)}.log li.g{border-color:var(--gr)}.log time{color:var(--mut);margin-right:6px}
+.term li{border-color:var(--cy);font-family:Consolas,monospace}.empty{color:var(--mut);border-color:var(--line)!important}
+@keyframes in{from{opacity:0;transform:translateX(-6px)}}
+.tl{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--line)}.tl li{padding:4px 0 4px 10px;color:var(--mut)}.tl li.on{color:var(--cy);text-shadow:0 0 8px var(--cy);font-weight:700}.tl li.done{color:var(--gr)}
+.ask{display:flex;gap:8px;margin-top:8px}input,button{font:inherit;padding:7px 10px;border-radius:5px;border:1px solid var(--line);background:#07101d;color:var(--tx)}input{flex:1;min-width:0}button{cursor:pointer}button:hover{border-color:var(--cy)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.out{border-left:4px solid var(--cy);background:#07101d;padding:10px 12px;white-space:pre-line}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--cy);color:#031018;padding:8px 18px;border-radius:4px;font-weight:600;z-index:10}
+@media(max-width:1000px){main{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){main{grid-template-columns:1fr;padding:0 12px 16px}.kpis,.top{padding-left:12px;padding-right:12px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<div id="boot" class="boot" role="status">Establishing link to Aster-7...</div>
+<header class="top"><h1>SpaceOps <small>Aster-7</small></h1><span class="sim">SIMULATED MISSION DATA</span><span class="met" id="met">MET 00:00:00</span></header>
+<section class="kpis" id="kpis" aria-label="Mission summary"></section>
+<main>
+<section class="p orbit"><h2>Orbit &amp; ground link</h2>
+<svg viewBox="0 0 200 120" role="img" aria-label="Spacecraft orbit around a planet"><defs><radialGradient id="pl"><stop offset="0" stop-color="#2b6cb0"/><stop offset="1" stop-color="#0a1a33"/></radialGradient></defs>
+<ellipse cx="100" cy="60" rx="82" ry="46" fill="none" stroke="#2a4a6a" stroke-dasharray="3 3"/><circle cx="100" cy="60" r="28" fill="url(#pl)"/><circle cx="100" cy="32" r="2.5" fill="#3ddc84"/><text x="106" y="30" font-size="6" fill="#3ddc84">Ground</text>
+<line id="lnk" stroke="#35e0ff" stroke-width=".6" stroke-dasharray="2 2"/><g id="craft"><circle r="3.5" fill="#fff"/><circle r="7" fill="#35e0ff" opacity=".25"/></g></svg>
+<p id="orb" class="note"></p></section>
+<section class="p"><h2>Telemetry</h2><div class="ch"><span>Battery %</span><canvas id="c1" width="360" height="70"></canvas><span>Temperature C</span><canvas id="c2" width="360" height="70"></canvas><span>Signal %</span><canvas id="c3" width="360" height="70"></canvas></div></section>
+<section class="p"><h2>Subsystems</h2><div id="subs" class="subs"></div></section>
+<section class="p"><h2>Alert console</h2><ul id="alerts" class="log"></ul></section>
+<section class="p"><h2>Mission timeline</h2><ol id="tl" class="tl"></ol></section>
+<section class="p"><h2>Command interface</h2><ul id="term" class="log term"></ul><div class="ask"><input id="cmd" placeholder="type help" aria-label="Command input" autocomplete="off"><button id="run">Send</button></div></section>
+<section class="p wide"><h2>Mission AI</h2><div id="chips" class="chips"></div><div id="out" class="out">Select a question about the simulated telemetry.</div></section>
+</main>
+<div id="toast" class="toast" role="alert" hidden></div>
+<script>// SIMULATED MISSION DATA - fictional spacecraft "Aster-7". Not real telemetry.
+const MISSION={name:"Aster-7",phases:["Launch","Orbit insertion","Cruise","Science operations","Eclipse pass"]};
+const SUBS=["Power","Thermal","Comms","Propulsion","Payload","Attitude"];
+const HELP=["help - list commands","status - mission summary","ping - test link to ground","heater on|off - control heater","reorient - realign antenna","safemode - toggle low-power mode","phase next - advance mission phase"];
+</script><script>const $=id=>document.getElementById(id);
+let s={bat:84,temp:23,sig:80,pow:330,fuel:96,met:0,ang:-1.2,heater:false,safe:false,phase:2,spike:0,alerted:{}},H={bat:[],temp:[],sig:[]},prev=null,hist=[],hi=0;
+const now=()=>new Date().toLocaleTimeString([], {hour12:false});
+function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2000)}
+function log(id,t,c){const ul=$(id),e=ul.querySelector(".empty");if(e)e.remove();const li=document.createElement("li");if(c)li.className=c;li.innerHTML=`<time>${now()}</time>${t}`;ul.prepend(li);while(ul.children.length>14)ul.lastChild.remove()}
+const ecl=()=>Math.sin(s.ang)>0&&Math.abs(Math.cos(s.ang)*82)<28;
+function subs(){const h={Power:Math.min(100,s.bat+10),Thermal:Math.max(0,100-Math.abs(s.temp-22)*4),Comms:s.sig,Propulsion:s.fuel,Payload:s.safe?60:91,Attitude:88};return h}
+const st=v=>v>=65?"ok":v>=40?"wa":"al",lab={ok:"Nominal",wa:"Watch",al:"Alert"};
+function tick(){prev={...s};s.met++;s.ang+=0.05;
+ const e=ecl();s.bat=Math.max(0,Math.min(100,s.bat+(e?-0.25:0.12)*(s.safe?.5:1)-(s.heater?.05:0)));
+ let tgt=22+(e?-6:4)+(s.heater?8:0)+s.spike;if(s.spike>0)s.spike-=0.8;if(s.spike<0)s.spike=0;s.temp+=(tgt-s.temp)*.12+(Math.random()-.5)*.4;
+ if(Math.random()<.025&&s.spike===0){s.spike=14;log("alerts","Anomaly: thermal spike detected on Payload bus","r")}
+ const x=100+82*Math.cos(s.ang),y=60+46*Math.sin(s.ang),d=Math.hypot(x-100,y-32);s.sig+=((s.align?95:Math.max(15,90-d*.5))-s.sig)*.2+(Math.random()-.5)*2;
+ s.pow=(s.safe?210:330)+(e?-60:20)+Math.random()*8;s.fuel-=.002;
+ H.bat.push(s.bat);H.temp.push(s.temp);H.sig.push(s.sig);Object.values(H).forEach(a=>a.length>60&&a.shift());
+ [["bat",s.bat<30,"Battery below 30%"],["temp",s.temp>36,"Temperature above 36 C"],["sig",s.sig<35,"Signal below 35%"]].forEach(a=>{if(a[1]&&!s.alerted[a[0]]){log("alerts",a[2],"r");s.alerted[a[0]]=1}if(!a[1])s.alerted[a[0]]=0});
+ hist.push({t:s.met,bat:s.bat,temp:s.temp,sig:s.sig});if(hist.length>12)hist.shift();render()}
+function chart(id,a,col,lo,hi){const c=$(id),x=c.getContext("2d");x.clearRect(0,0,c.width,c.height);x.strokeStyle="#16304a";x.lineWidth=1;for(let i=1;i<4;i++){x.beginPath();x.moveTo(0,i*17.5);x.lineTo(c.width,i*17.5);x.stroke()}
+ x.strokeStyle=col;x.lineWidth=2;x.shadowColor=col;x.shadowBlur=8;x.beginPath();a.forEach((v,i)=>{const px=i/59*c.width,py=c.height-(v-lo)/(hi-lo)*c.height;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();x.shadowBlur=0}
+function render(){const h=subs(),vals=Object.values(h),health=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length),al=$("alerts").querySelectorAll(".r").length;
+ const k=[["Mission health",health+"%",st(health)],["Comms signal",Math.round(s.sig)+"%",st(s.sig)],["Battery",s.bat.toFixed(1)+"%",st(s.bat)],["Temperature",s.temp.toFixed(1)+" C",s.temp>36||s.temp<5?"al":"ok"],["Phase",MISSION.phases[s.phase],"ok"],["Power draw",Math.round(s.pow)+" W","ok"]];
+ $("kpis").innerHTML=k.map(x=>`<div class="k"><b class="${x[2]}">${x[1]}</b><span>${x[0]}</span></div>`).join("");
+ $("subs").innerHTML=SUBS.map(n=>{const v=Math.round(h[n]),c=st(v);return`<div class="s ${c}"><b style="color:var(--tx)">${n}</b>${lab[c]} ${v}%<i style="width:${v}%"></i></div>`}).join("");
+ const hh=Math.floor(s.met/3600),mm=Math.floor(s.met%3600/60);$("met").textContent=`MET ${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(s.met%60).padStart(2,"0")}`;
+ const x=100+82*Math.cos(s.ang),y=60+46*Math.sin(s.ang);$("craft").setAttribute("transform",`translate(${x} ${y})`);$("lnk").setAttribute("x1",100);$("lnk").setAttribute("y1",32);$("lnk").setAttribute("x2",x);$("lnk").setAttribute("y2",y);$("lnk").style.opacity=s.sig>35?1:.2;
+ $("orb").textContent=ecl()?"In planetary shadow: battery draining.":"In sunlight: battery charging.";
+ chart("c1",H.bat,"#3ddc84",0,100);chart("c2",H.temp,"#ffb020",0,50);chart("c3",H.sig,"#35e0ff",0,100);
+ $("tl").innerHTML=MISSION.phases.map((p,i)=>`<li class="${i<s.phase?"done":i===s.phase?"on":""}">${p}</li>`).join("")}
+function cmd(t){t=t.trim().toLowerCase();if(!t)return;hist.cmds=(hist.cmds||[]);hist.cmds.push(t);hi=hist.cmds.length;log("term","&gt; "+t);let r;
+ if(t==="help")r=HELP.join("<br>");else if(t==="status")r=`Health nominal? Battery ${s.bat.toFixed(0)}%, temp ${s.temp.toFixed(1)} C, signal ${s.sig.toFixed(0)}%.`;
+ else if(t==="ping")r=`Reply in ${Math.round(400-s.sig*2.5)} ms (simulated)`;else if(t==="heater on"){s.heater=true;r="Heater ON"}else if(t==="heater off"){s.heater=false;r="Heater OFF"}
+ else if(t==="reorient"){s.align=true;setTimeout(()=>s.align=false,15000);r="Antenna realigned for 15 s"}
+ else if(t==="safemode"){s.safe=!s.safe;r="Safe mode "+(s.safe?"ON (low power)":"OFF")}
+ else if(t==="phase next"){s.phase=(s.phase+1)%MISSION.phases.length;r="Phase: "+MISSION.phases[s.phase]}else r="Unknown command. Type help.";
+ log("term",r,"g");toast("Command sent");render()}
+$("run").onclick=()=>{cmd($("cmd").value);$("cmd").value=""};
+$("cmd").onkeydown=e=>{if(e.key==="Enter"){cmd($("cmd").value);$("cmd").value=""}else if(e.key==="ArrowUp"&&hist.cmds){hi=Math.max(0,hi-1);$("cmd").value=hist.cmds[hi]||""}};
+function ai(k){const h=subs(),w=Object.entries(h).sort((a,b)=>a[1]-b[1])[0],a=[...$("alerts").querySelectorAll(".r")][0];
+ if(k==0)return a?`Latest anomaly: ${a.textContent}. Temperature now ${s.temp.toFixed(1)} C. Thermal spikes in this simulation usually decay within about 20 s.`:"No anomalies logged yet.";
+ if(k==1)return`${w[0]} needs most attention at ${Math.round(w[1])}% (${lab[st(w[1])]}).`;
+ if(k==2)return`Phase: ${MISSION.phases[s.phase]}. Battery ${s.bat.toFixed(0)}%, temp ${s.temp.toFixed(1)} C, signal ${s.sig.toFixed(0)}%, draw ${Math.round(s.pow)} W. ${ecl()?"Spacecraft is in shadow.":"Spacecraft is in sunlight."} (Simulated data.)`;
+ const o=hist[0]||{bat:s.bat,temp:s.temp,sig:s.sig},f=v=>(v>0?"+":"")+v.toFixed(1);return`Over the last ${hist.length} s: battery ${f(s.bat-o.bat)}%, temperature ${f(s.temp-o.temp)} C, signal ${f(s.sig-o.sig)}%.`}
+$("chips").innerHTML=["Explain the latest telemetry anomaly","Which subsystem needs attention?","Summarize the mission status","What changed in the last update?"].map((x,i)=>`<button data-i="${i}">${x}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.dataset.i)$("out").textContent=ai(+e.target.dataset.i)};
+$("alerts").innerHTML='<li class="empty">No active alerts. All subsystems nominal.</li>';
+setTimeout(()=>{const b=$("boot");if(location.search.includes("error")){b.className="boot err";b.innerHTML='Link lost. <button onclick="location.href=location.pathname">Retry</button>';return}
+ b.style.opacity=0;setTimeout(()=>b.remove(),600);for(let i=0;i<30;i++)tick();log("term","Link established. Type help.","g");setInterval(tick,1000)},900);
+</script></body></html>

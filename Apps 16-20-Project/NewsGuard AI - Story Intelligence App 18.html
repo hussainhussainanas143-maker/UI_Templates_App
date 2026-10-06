@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NewsGuard AI - Story Intelligence</title><style>:root{--ink:#1c2733;--bg:#eef1f5;--card:#fff;--blue:#2f5bea;--amber:#c47a00;--green:#1f7a4d;--red:#b3402f;--mut:#667385;--line:#d5dbe3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+h1,h2,h3{font-family:Georgia,serif;margin:0}:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:14px 24px;background:var(--ink);color:#fff}.top input{margin-left:auto;min-width:200px}
+.demo{background:#f6c453;color:#2a1c00;padding:3px 10px;border-radius:4px;font-size:.78rem;font-weight:600}
+input,select,button{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px}button{cursor:pointer;background:#fff}
+.stats{display:flex;flex-wrap:wrap;gap:24px;padding:14px 24px;border-bottom:1px solid var(--line);background:#fff}.stats div b{font:700 1.5rem Georgia,serif;display:block}.stats span{font-size:.8rem;color:var(--mut)}
+.topics{display:flex;flex-wrap:wrap;gap:6px;padding:12px 24px}.topics button{border-radius:20px;padding:3px 12px}.topics button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:16px;padding:0 24px 24px}
+.list label{font-size:.85rem;color:var(--mut)}.s{display:block;width:100%;text-align:left;margin-top:8px;padding:12px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line)}
+.s[aria-current=true]{border-left-color:var(--blue);box-shadow:0 2px 10px rgba(47,91,234,.15)}.s small{color:var(--mut);display:block}.brk{color:var(--red);font-weight:700;font-size:.75rem}
+.detail{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px;min-width:0}.empty{color:var(--mut);padding:16px}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.8rem;font-weight:600}.Corroborated{background:#d8f0e3;color:var(--green)}.Partially{background:#fbe8c2;color:var(--amber)}.Unverified{background:#f6d9d3;color:var(--red)}
+.note{font-size:.82rem;color:var(--mut)}.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}h3{font-size:1rem;margin:16px 0 8px}
+.tl{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--blue)}.tl li{margin-bottom:10px;padding-left:10px}.tl b{color:var(--blue)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{padding:6px;text-align:left;border-bottom:1px solid var(--line)}
+.sent{position:relative;width:90px;height:8px;background:linear-gradient(90deg,#f1c1b8,#e5e9ef,#bfe3cf);border-radius:4px}.sent i{position:absolute;top:-3px;width:4px;height:14px;background:var(--ink);border-radius:2px}
+.rel button{margin:0 6px 6px 0;border-radius:16px}.ai{margin-top:16px;background:var(--bg);padding:12px;border-radius:8px}.ai button{margin:0 6px 6px 0;font-size:.85rem}
+.out{background:#fff;border-left:4px solid var(--blue);padding:10px 12px;border-radius:4px;margin-top:6px;white-space:pre-line;animation:in .25s}
+@keyframes in{from{opacity:0;transform:translateY(4px)}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 18px;border-radius:6px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.cols{grid-template-columns:1fr}}
+@media(max-width:600px){.top,.stats,.topics{padding-left:12px;padding-right:12px}.layout{padding:0 12px 20px}.top input{margin-left:0;width:100%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head>
+<body>
+<header class="top"><h1>NewsGuard AI</h1><span class="demo">DEMO - fictional stories and sources</span>
+<input id="q" type="search" placeholder="Search stories or topics" aria-label="Search stories"></header>
+<section class="stats" id="stats" aria-label="Overview"></section>
+<div class="topics" id="topics" role="group" aria-label="Filter by topic"></div>
+<div class="layout">
+<nav class="list" aria-label="Story clusters"><label>Sort <select id="sort"><option value="cov">Most sources</option><option value="brk">Breaking first</option></select></label><div id="stories"></div><p id="empty" class="empty" hidden>No stories match. Clear the search or choose "All topics".</p></nav>
+<article class="detail" id="detail" aria-live="polite"><p class="empty" id="load">Loading story clusters...</p></article></div>
+<div id="toast" class="toast" role="alert" hidden></div>
+<script>// DEMO / FICTIONAL stories and sources. Not real news.
+const STORIES=[
+{id:1,title:"Riverbend Bridge Closed After Inspection Finding",topic:"Infrastructure",breaking:true,status:"Corroborated",
+ summary:"Officials closed the fictional Riverbend Bridge after an inspection reported cracking in a support beam. Reopening timelines differ between outlets.",
+ sources:[["Harbor Daily","Reports closure as precaution",.1,"Detailed"],["Meridian Wire","Stresses commuter disruption",-.4,"Moderate"],["The Lantern","Questions past maintenance",-.6,"Detailed"],["Civic Ledger","Quotes city engineer",.2,"Detailed"]],
+ timeline:[["06:10","Inspection team flags cracking"],["08:00","City announces closure"],["11:30","Detour plan published"],["15:00","Engineer says repairs may take weeks"]],related:[2,5]},
+{id:2,title:"City Council Debates Transit Fare Change",topic:"Transit",breaking:false,status:"Partially confirmed",
+ summary:"A proposed fare adjustment was discussed. Outlets disagree on whether a vote has been scheduled.",
+ sources:[["Harbor Daily","Neutral meeting recap",0,"Moderate"],["Plainfield Post","Highlights rider concerns",-.5,"Brief"],["Civic Ledger","Reports vote date as tentative",.1,"Detailed"]],
+ timeline:[["Mon","Proposal tabled"],["Tue","Public comment session"],["Wed","Vote date reported, unconfirmed"]],related:[1]},
+{id:3,title:"Startup Lumen Labs Announces Battery Prototype",topic:"Technology",breaking:false,status:"Unverified",
+ summary:"A company claims a longer-lasting battery prototype. No independent testing has been reported yet.",
+ sources:[["Meridian Wire","Repeats company claims",.6,"Brief"],["The Lantern","Notes lack of independent data",-.2,"Moderate"]],
+ timeline:[["09:00","Press release issued"],["13:00","Analysts request test data"]],related:[]},
+{id:4,title:"Coastal Town Prepares for Storm Surge Warning",topic:"Weather",breaking:true,status:"Corroborated",
+ summary:"Local authorities issued a simulated storm surge advisory. Coverage agrees on evacuation zones but differs on expected severity.",
+ sources:[["Harbor Daily","Lists evacuation zones",-.1,"Detailed"],["Plainfield Post","Focuses on preparedness tips",.2,"Moderate"],["Civic Ledger","Cites forecast ranges",0,"Detailed"],["Meridian Wire","Emphasizes worst-case scenario",-.7,"Moderate"]],
+ timeline:[["Day 1","Advisory issued"],["Day 2","Shelters opened"],["Day 3","Forecast range narrowed"]],related:[5]},
+{id:5,title:"Port Authority Reports Shipping Delays",topic:"Economy",breaking:false,status:"Partially confirmed",
+ summary:"Delays at the fictional Port of Alder are attributed to different causes depending on the outlet.",
+ sources:[["Civic Ledger","Cites labor scheduling",-.1,"Detailed"],["The Lantern","Cites equipment failure",-.4,"Moderate"],["Harbor Daily","Cause not stated",0,"Brief"]],
+ timeline:[["Mon","Delays first noted"],["Wed","Authority issues statement"]],related:[1,4]}];
+const ALL_SOURCES=["Harbor Daily","Meridian Wire","The Lantern","Plainfield Post","Civic Ledger"];
+</script><script>const $=id=>document.getElementById(id);
+let sel=1,topic="",watch=[];try{watch=JSON.parse(localStorage.getItem("ng_watch")||"[]")}catch(e){}
+const avg=s=>s.sources.reduce((a,x)=>a+x[2],0)/s.sources.length;
+const key=s=>s.status.split(" ")[0];
+function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2000)}
+function stats(){const topics=[...new Set(STORIES.map(s=>s.topic))];
+ $("stats").innerHTML=[["Story clusters",STORIES.length],["Breaking",STORIES.filter(s=>s.breaking).length],["Sources tracked",ALL_SOURCES.length],["Topics",topics.length]].map(x=>`<div><b>${x[1]}</b><span>${x[0]}</span></div>`).join("");
+ $("topics").innerHTML=["All topics",...topics].map(t=>`<button aria-pressed="${(t==="All topics"?"":t)===topic}" data-t="${t==="All topics"?"":t}">${t}</button>`).join("")}
+$("topics").onclick=e=>{if(e.target.dataset.t!==undefined){topic=e.target.dataset.t;stats();list()}};
+function list(){const q=$("q").value.toLowerCase();let l=STORIES.filter(s=>(!topic||s.topic===topic)&&(s.title+s.topic).toLowerCase().includes(q));
+ l.sort($("sort").value==="cov"?(a,b)=>b.sources.length-a.sources.length:(a,b)=>b.breaking-a.breaking);
+ $("empty").hidden=l.length>0;
+ $("stories").innerHTML=l.map(s=>`<button class="s" data-id="${s.id}" aria-current="${s.id===sel}">${s.breaking?'<span class="brk">BREAKING</span>':""}<b>${s.title}</b><small>${s.topic} - ${s.sources.length} sources${watch.includes(s.id)?" - watching":""}</small></button>`).join("")}
+$("stories").onclick=e=>{const b=e.target.closest("[data-id]");if(b){sel=+b.dataset.id;list();detail()}};
+["q","sort"].forEach(i=>$(i).addEventListener("input",list));
+function detail(){const s=STORIES.find(x=>x.id===sel),div=Math.round(new Set(s.sources.map(x=>x[0])).size/ALL_SOURCES.length*100);
+ $("detail").innerHTML=`<h2>${s.title}</h2><p><span class="badge ${key(s)}">Verification: ${s.status}</span> <span class="note">Source diversity ${div}%. Status reflects cross-source agreement, not a ruling on truth.</span></p>
+ <p>${s.summary}</p>
+ <div class="cols"><div><h3>Story timeline</h3><ol class="tl">${s.timeline.map(t=>`<li><b>${t[0]}</b> ${t[1]}</li>`).join("")}</ol></div>
+ <div><h3>Related stories</h3><div class="rel">${s.related.length?s.related.map(r=>`<button data-r="${r}">${STORIES.find(x=>x.id===r).title}</button>`).join(""):'<span class="note">No related stories in this demo set.</span>'}</div>
+ <button id="watch">${watch.includes(s.id)?"Stop watching":"Watch this story"}</button></div></div>
+ <h3>Source comparison</h3><div class="tw"><table><thead><tr><th>Source</th><th>Coverage angle</th><th>Tone</th><th>Depth</th></tr></thead><tbody>${s.sources.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td><div class="sent" title="${x[2]}"><i style="left:${(x[2]+1)*50}%"></i></div></td><td>${x[3]}</td></tr>`).join("")}</tbody></table></div>
+ <div class="ai"><b>AI analysis</b> <span class="note">(generated from demo data)</span><div><button data-a="sum">Summarize this story</button><button data-a="dev">How has it developed?</button><button data-a="cmp">Compare these sources</button><button data-a="evt">Major events</button></div><div class="out" id="out">Choose a question above.</div></div>`;
+ $("detail").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{sel=+b.dataset.r;list();detail()});
+ $("watch").onclick=()=>{watch=watch.includes(s.id)?watch.filter(x=>x!==s.id):[...watch,s.id];try{localStorage.setItem("ng_watch",JSON.stringify(watch))}catch(e){}toast(watch.includes(s.id)?"Watching story":"Stopped watching");list();detail()};
+ $("detail").querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>$("out").textContent=ai(s,b.dataset.a))}
+function ai(s,k){const t=avg(s),tone=t>.2?"mostly positive":t<-.2?"mostly negative":"mixed or neutral";
+ if(k==="sum")return`${s.summary}\nCoverage: ${s.sources.length} sources, overall tone ${tone}. Status "${s.status}" means ${key(s)==="Corroborated"?"several sources agree on core facts":key(s)==="Partially"?"sources agree on some facts but differ on others":"few or no independent sources confirm the claim yet"}. Uncertainty remains.`;
+ if(k==="dev")return`Over ${s.timeline.length} updates: `+s.timeline.map(t=>t[1]).join(" > ")+".";
+ if(k==="cmp"){const hi=[...s.sources].sort((a,b)=>b[2]-a[2]);return`Most positive framing: ${hi[0][0]} (${hi[0][1].toLowerCase()}). Most negative: ${hi[hi.length-1][0]} (${hi[hi.length-1][1].toLowerCase()}). Differences in framing are not proof that either is inaccurate.`}
+ return s.timeline.map(t=>"- "+t[0]+": "+t[1]).join("\n")}
+function init(){setTimeout(()=>{if(location.search.includes("error")){$("detail").innerHTML='<p class="empty">Could not load stories. <button onclick="location.href=location.pathname">Retry</button></p>';return}stats();list();detail()},600)}
+init();
+</script></body></html>
