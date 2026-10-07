@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LegalLens - Document Intelligence</title>
+<style>:root{--paper:#fbf8f1;--ink:#2a2622;--dark:#171c2b;--dk2:#222a40;--gold:#d9a441;--lo:#3fae6d;--md:#e3a21a;--hi:#d9534f}
+*{box-sizing:border-box}body{margin:0;font:15px/1.55 system-ui,sans-serif;background:var(--dark);color:#e8ebf5}
+.top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 18px;background:#0f1320;position:sticky;top:0;z-index:5}
+.brand{font-size:1.2rem}.brand span{color:var(--gold)}.badge{background:var(--gold);color:#2a1d00;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:99px}
+input{margin-left:auto;padding:8px 12px;border-radius:8px;border:1px solid #3a4260;background:var(--dk2);color:#fff;min-width:200px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.split{display:grid;grid-template-columns:1.2fr 1fr;min-height:calc(100vh - 52px)}
+.doc{background:var(--paper);color:var(--ink);padding:28px 34px;font-family:Georgia,serif}
+.doc h1{font-size:1.5rem;margin:0 0 4px}.parties{font-size:.9rem;color:#6b645a;margin-bottom:18px}
+.cl{display:block;width:100%;text-align:left;background:none;border:0;border-left:4px solid transparent;padding:10px 12px;margin:4px 0;font:inherit;color:inherit;cursor:pointer;border-radius:4px}
+.cl:hover{background:#f0e9d8}.cl.sel{background:#f5e6bd;border-left-color:var(--gold)}
+.cl h3{margin:0 0 3px;font-size:1rem}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.low{background:var(--lo)}.med{background:var(--md)}.high{background:var(--hi)}
+mark{background:#ffe27a}
+.panel{background:var(--dk2);padding:20px;border-left:1px solid #3a4260}.panel h2{margin:0 0 10px;font-size:1.05rem;color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.chips button{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:99px;padding:4px 11px;cursor:pointer;font-size:.8rem}
+.chips button:hover{background:var(--gold);color:#2a1d00}
+.out{background:var(--dark);border-radius:10px;padding:14px;min-height:200px;animation:f .3s}.out h3{margin:.2em 0}.out ul{padding-left:18px}
+.tag{display:inline-block;background:#323b5c;border-radius:6px;padding:1px 8px;margin:2px;font-size:.8rem}
+.tl{border-left:2px solid var(--gold);padding-left:12px;margin:8px 0}
+.skel{height:300px;background:linear-gradient(90deg,#eee,#e2dccd,#eee);background-size:200%;animation:s 1.2s infinite}
+.error{background:#5b1f1f;padding:10px 18px}.error button{margin-left:8px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translate(-50%,70px);background:#000;padding:9px 16px;border-radius:8px;opacity:0;transition:.3s}.toast.show{transform:translate(-50%,0);opacity:1}
+@keyframes f{from{opacity:0}}@keyframes s{to{background-position:-200%}}
+@media(max-width:850px){.split{grid-template-columns:1fr}.doc{padding:18px}input{margin-left:0;width:100%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <b class="brand">Legal<span>Lens</span></b>
+  <span class="badge">FICTIONAL DEMO DOCUMENT - NOT LEGAL ADVICE</span>
+  <input id="search" type="search" placeholder="Search document ( / )" aria-label="Search document">
+</header>
+<div id="error" class="error" role="alert" hidden>Document failed to load. <button id="retry">Retry</button></div>
+<div class="split">
+  <section class="doc" aria-label="Document"><div id="docBody" class="skel"></div><p id="empty" hidden>No clauses match your search.</p></section>
+  <aside class="panel" aria-label="AI intelligence panel">
+    <h2>AI Intelligence</h2>
+    <div class="chips" id="chips"></div>
+    <div id="out" class="out" aria-live="polite"></div>
+  </aside>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>// FICTIONAL DEMO DOCUMENT - not a real contract, not legal advice.
+window.LEGAL = {
+  title: "Master Services Agreement (Demo)",
+  parties: [{n:"Northwind Labs Ltd.",r:"Client"},{n:"Lumen Studio LLP",r:"Provider"}],
+  clauses: [
+    {id:"c1",num:"1",title:"Scope of Services",risk:"low",
+     text:"The Provider shall deliver the website redesign and monthly maintenance services described in Schedule A. Any work outside Schedule A requires a written change request signed by both parties.",
+     summary:"Defines what work is covered and how extra work is approved.",terms:["Schedule A","change request"],dates:[],obl:["Provider delivers Schedule A services","Both parties sign change requests for extra work"],simple:"Only the listed work is included. If you want more, both sides must agree in writing first."},
+    {id:"c2",num:"2",title:"Payment Terms",risk:"med",
+     text:"The Client shall pay each invoice within 30 days of receipt. Late payments accrue interest at 1.5% per month. The first invoice is due on 15 January 2027.",
+     summary:"Sets invoice deadlines and a late-payment interest charge.",terms:["30 days","1.5% per month"],dates:[["First invoice due","2027-01-15"]],obl:["Client pays invoices within 30 days","Client pays late interest if overdue"],simple:"Pay within a month of getting the bill, or extra interest is added each month."},
+    {id:"c3",num:"3",title:"Term and Renewal",risk:"med",
+     text:"This Agreement begins on 1 January 2027 and continues for 12 months. It renews automatically for further 12-month periods unless either party gives 60 days' written notice before the renewal date.",
+     summary:"12-month term that auto-renews unless notice is given 60 days ahead.",terms:["auto-renewal","60 days' notice"],dates:[["Start date","2027-01-01"],["Notice deadline","2027-11-02"],["Renewal date","2028-01-01"]],obl:["Either party gives 60 days' notice to avoid renewal"],simple:"The deal repeats every year by itself unless someone says no at least 60 days before."},
+    {id:"c4",num:"4",title:"Confidentiality",risk:"low",
+     text:"Each party shall keep the other's confidential information secret and use it only for this Agreement. This duty continues for 3 years after the Agreement ends.",
+     summary:"Both sides must protect shared confidential information, even after the deal ends.",terms:["confidential information","3 years"],dates:[],obl:["Keep confidential information secret","Use it only for this Agreement"],simple:"Don't share the other side's secrets. This lasts three years after the contract ends."},
+    {id:"c5",num:"5",title:"Intellectual Property",risk:"high",
+     text:"All deliverables become the property of the Client only after full payment. Until then the Provider retains ownership and grants a limited licence for review purposes.",
+     summary:"Ownership of the work transfers only once everything is paid.",terms:["deliverables","full payment","limited licence"],dates:[],obl:["Client pays in full before ownership transfers","Provider grants a review-only licence meanwhile"],simple:"The client owns the finished work only after paying everything. Before that, it can only be looked at."},
+    {id:"c6",num:"6",title:"Termination",risk:"med",
+     text:"Either party may terminate for material breach if the breach is not fixed within 14 days of written notice. The Client must pay for work completed up to the termination date.",
+     summary:"Allows ending the contract for uncorrected serious breaches.",terms:["material breach","14 days"],dates:[],obl:["Fix a breach within 14 days of notice","Client pays for work completed"],simple:"If one side seriously breaks the deal and doesn't fix it in 14 days, the other can end it."},
+    {id:"c7",num:"7",title:"Limitation of Liability",risk:"high",
+     text:"The Provider's total liability under this Agreement shall not exceed the fees paid in the preceding 6 months. Neither party is liable for indirect or consequential losses.",
+     summary:"Caps the Provider's liability and excludes indirect losses.",terms:["liability cap","6 months of fees","consequential losses"],dates:[],obl:["Neither party claims indirect losses"],simple:"If something goes wrong, the most the Provider pays is about six months of fees."}
+  ]
+};
+</script>
+<script>(function(){
+const $=s=>document.querySelector(s),L=window.LEGAL;
+let sel=null,q="";
+try{sel=localStorage.getItem("ll-sel")}catch(e){}
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const fmt=d=>new Date(d+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2000)}
+function hl(s){s=esc(s);if(!q)return s;return s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),m=>"<mark>"+m+"</mark>")}
+function renderDoc(){
+ const list=L.clauses.filter(c=>(c.title+c.text).toLowerCase().includes(q.toLowerCase()));
+ $("#docBody").classList.remove("skel");
+ $("#docBody").innerHTML=`<h1>${L.title}</h1><div class="parties">Between ${L.parties.map(p=>p.n+" ("+p.r+")").join(" and ")}</div>`+
+  list.map(c=>`<button class="cl ${c.id===sel?"sel":""}" data-id="${c.id}" aria-pressed="${c.id===sel}"><h3><span class="dot ${c.risk}" title="${c.risk} risk indicator"></span>${c.num}. ${hl(c.title)}</h3>${hl(c.text)}</button>`).join("");
+ $("#empty").hidden=list.length>0;
+ document.querySelectorAll(".cl").forEach(b=>b.onclick=()=>select(b.dataset.id))}
+function select(id){sel=id;try{localStorage.setItem("ll-sel",id)}catch(e){}renderDoc();showClause();}
+const get=id=>L.clauses.find(c=>c.id===id);
+function showClause(){const c=get(sel);if(!c)return;
+ $("#out").innerHTML=`<h3>${c.num}. ${c.title}</h3><p>${c.summary}</p><p><b>Important terms:</b> ${c.terms.map(t=>`<span class="tag">${t}</span>`).join("")}</p>
+ <p><b>Related dates:</b> ${c.dates.length?c.dates.map(d=>`${d[0]}: ${fmt(d[1])}`).join("; "):"None in this clause"}</p>
+ <p><b>Obligations:</b></p><ul>${c.obl.map(o=>`<li>${o}</li>`).join("")}</ul><p><b>Risk indicator:</b> <span class="dot ${c.risk}"></span>${c.risk} (demo heuristic, not a legal assessment)</p>`}
+const cmds={
+ "Summarize this document":()=>`<h3>Summary</h3><p>A 12-month services agreement between ${L.parties[0].n} and ${L.parties[1].n}. It covers scope, 30-day payment, auto-renewal, confidentiality, payment-conditional IP ownership, termination and a liability cap.</p>`,
+ "Show important clauses":()=>`<h3>Clauses flagged</h3><ul>${L.clauses.filter(c=>c.risk!=="low").map(c=>`<li><span class="dot ${c.risk}"></span>${c.num}. ${c.title}: ${c.summary}</li>`).join("")}</ul>`,
+ "Create a timeline":()=>{const ev=L.clauses.flatMap(c=>c.dates.map(d=>[d[0],d[1],c.num])).sort((a,b)=>a[1].localeCompare(b[1]));return `<h3>Timeline</h3>`+ev.map(e=>`<div class="tl"><b>${fmt(e[1])}</b><br>${e[0]} (clause ${e[2]})</div>`).join("")},
+ "What obligations are mentioned?":()=>`<h3>Obligations</h3><ul>${L.clauses.flatMap(c=>c.obl.map(o=>`<li>${o} <span class="tag">cl. ${c.num}</span></li>`)).join("")}</ul>`,
+ "Explain this section in simple language":()=>{const c=get(sel);return c?`<h3>${c.num}. ${c.title} - plain language</h3><p>${c.simple}</p>`:null}
+};
+function run(name){const r=cmds[name]();if(r===null){toast("Select a clause first");return}$("#out").innerHTML=r+`<p class="small" style="opacity:.6">Demo output from a fictional document. Not legal advice.</p>`}
+Object.keys(cmds).forEach(k=>{const b=document.createElement("button");b.textContent=k;b.onclick=()=>run(k);$("#chips").appendChild(b)});
+$("#search").oninput=e=>{q=e.target.value.trim();renderDoc()};
+document.addEventListener("keydown",e=>{if(e.key==="/"&&document.activeElement.tagName!=="INPUT"){e.preventDefault();$("#search").focus()}});
+function load(){$("#error").hidden=true;$("#docBody").classList.add("skel");setTimeout(()=>{if(!L){$("#error").hidden=false;return}renderDoc();if(get(sel))showClause();else $("#out").textContent="Select a clause or run a command.";},500)}
+$("#retry").onclick=load;load();
+})();
+</script>
+</body>
+</html>

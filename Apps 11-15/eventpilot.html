@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EventPilot - Live Event Operations</title><style>:root{--bg:#f3f1ff;--ink:#1b1340;--v:#6c4cff;--lime:#b6f23a;--red:#ff4a5e;--amb:#ffb020;--grn:#27c46b;--mut:#6b6690;--line:#dcd8f5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Trebuchet MS","Segoe UI",sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+h1,h2{margin:0;font-family:"Arial Black","Segoe UI",sans-serif}h1{font-size:1.4rem;color:var(--v)}h2{font-size:.95rem;margin-bottom:8px}
+:focus-visible{outline:3px solid var(--v);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 20px;background:var(--ink);color:#fff}.top h1{color:var(--lime)}
+.live{display:flex;align-items:center;gap:6px;font-weight:700;font-size:.8rem}.live i{width:10px;height:10px;border-radius:50%;background:var(--red);animation:blink 1.2s infinite}@keyframes blink{50%{opacity:.2}}
+.demo{background:var(--amb);color:#2a1c00;padding:3px 10px;border-radius:4px;font-size:.75rem;font-weight:700}.clock{margin-left:auto;font-variant-numeric:tabular-nums;color:#c9c3f5}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px 20px}.k{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:8px 12px;box-shadow:3px 3px 0 var(--v)}.k b{display:block;font:1.6rem "Arial Black",sans-serif}.k span{font-size:.78rem;color:var(--mut)}
+main{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:0 20px 20px}.c{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.wide{grid-column:span 2}.map{grid-row:span 2}.ai{grid-column:1/-1}.state{padding:14px;color:var(--mut)}
+svg{width:100%;height:auto;background:#f8f7ff;border-radius:8px}.v{cursor:pointer}.note{font-size:.78rem;color:var(--mut);margin:6px 0 0}
+input,select,button,summary{font:inherit}input,select,button{padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff}button{cursor:pointer;background:var(--v);color:#fff;border:0;font-weight:600}button:hover{background:#563add}
+.qa{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.qa #auto{background:var(--lime);color:var(--ink)}.lb{display:block;font-size:.8rem;color:var(--mut)}.lb input,.form input{width:100%;margin-top:4px}
+.form{display:grid;gap:6px;margin-top:8px}summary{cursor:pointer;margin-top:10px;font-weight:600}
+.mini{list-style:none;margin:8px 0 0;padding:0}.mini li{padding:6px 8px;border-left:4px solid var(--v);background:#f8f7ff;margin-bottom:5px;font-size:.88rem;animation:in .3s}.mini li.hi{border-color:var(--red)}.mini li.ok{border-color:var(--grn)}.mini time{color:var(--mut);margin-right:6px}
+.mini button{margin-left:8px;padding:2px 8px;font-size:.78rem}.feed{max-height:260px;overflow:auto}@keyframes in{from{opacity:0;transform:translateY(-4px)}}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}.tools input{flex:1;min-width:150px}.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.88rem}th,td{padding:7px;text-align:left;border-bottom:1px solid var(--line)}
+.tag{padding:2px 9px;border-radius:10px;font-size:.75rem;font-weight:700;background:var(--line)}.tag.Live{background:var(--red);color:#fff}.bar{height:6px;background:var(--line);border-radius:3px;margin-top:3px}.bar i{display:block;height:100%;background:var(--v);border-radius:3px}
+.vols{display:flex;flex-wrap:wrap;gap:6px}.vol{padding:4px 10px;border-radius:14px;border:1px solid var(--line);font-size:.82rem}.vol.free{background:#e6fbe9}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.out{border-left:4px solid var(--v);background:#f8f7ff;padding:10px 12px;white-space:pre-line}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 18px;border-radius:20px;z-index:5}
+@media(max-width:1000px){main{grid-template-columns:1fr 1fr}.map{grid-row:auto}.wide{grid-column:1/-1}}
+@media(max-width:620px){main{grid-template-columns:1fr;padding:0 12px 16px}.kpis,.top{padding-left:12px;padding-right:12px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head>
+<body>
+<header class="top"><h1>EventPilot</h1><span class="live"><i></i>LIVE</span><span class="demo">DEMO / SIMULATED DATA</span><span id="clock" class="clock"></span></header>
+<section class="kpis" id="kpis" aria-label="Key figures"></section>
+<div id="state" class="state" role="status">Connecting to event feed...</div>
+<main id="main" hidden>
+<section class="c map"><h2>Event map</h2><svg id="map" viewBox="0 0 100 100" role="img" aria-label="Venue utilization map"></svg><p class="note">Color shows live utilization: green low, amber busy, red near capacity.</p></section>
+<section class="c"><h2>Quick actions</h2><div class="qa"><button id="scan">Simulate QR check-in</button><button id="auto" aria-pressed="true">Auto check-in: on</button></div>
+<label class="lb">Announcement<input id="ann" placeholder="Type and press Enter" aria-label="Announcement text"></label><ul id="anns" class="mini"></ul>
+<details><summary>Log incident</summary><div class="form"><input id="it" placeholder="What happened?" aria-label="Incident title"><select id="iv" aria-label="Venue"></select><select id="is" aria-label="Severity"><option>Low</option><option>Medium</option><option>High</option></select><button id="ia">Log incident</button></div></details></section>
+<section class="c"><h2>Incidents</h2><ul id="incs" class="mini"></ul><p id="noinc" class="state" hidden>No open incidents. Log one under Quick actions.</p></section>
+<section class="c wide"><h2>Sessions</h2><div class="tools"><input id="q" type="search" placeholder="Search sessions or speakers" aria-label="Search sessions"><select id="f" aria-label="Filter status"><option value="">All</option><option>Live</option><option>Upcoming</option><option>Done</option></select><select id="s" aria-label="Sort"><option value="time">Start time</option><option value="att">Attendance</option></select></div>
+<div class="tw"><table><thead><tr><th>Time</th><th>Session</th><th>Venue</th><th>Status</th><th>Attendance</th></tr></thead><tbody id="rows"></tbody></table></div><p id="empty" class="state" hidden>No sessions match. Clear the search or choose "All".</p></section>
+<section class="c"><h2>Activity feed</h2><ul id="feed" class="mini feed"></ul></section>
+<section class="c"><h2>Volunteers</h2><div id="vols" class="vols"></div></section>
+<section class="c ai"><h2>Event copilot</h2><div id="chips" class="chips"></div><div id="out" class="out">Pick a question.</div></section>
+</main>
+<div id="toast" class="toast" role="alert" hidden></div>
+<script>// DEMO / SIMULATED data for a fictional event "Campus TechFest".
+const EVENT={name:"Campus TechFest",registered:1200,checked:540};
+const VENUES=[{id:"V1",n:"Main Auditorium",cap:500,x:50,y:20},{id:"V2",n:"Hall B",cap:200,x:18,y:48},{id:"V3",n:"Workshop Lab",cap:80,x:82,y:46},{id:"V4",n:"Open Arena",cap:400,x:48,y:72},{id:"V5",n:"Exhibition Wing",cap:300,x:84,y:80}];
+const SESSIONS=[
+{id:"S1",n:"Opening Keynote",who:"Dr. A. Rao",v:"V1",time:"09:00",att:0,st:"Done"},
+{id:"S2",n:"AI in Everyday Apps",who:"M. Jensen",v:"V1",time:"11:00",att:430,st:"Live"},
+{id:"S3",n:"Startup Pitch Round",who:"Panel",v:"V2",time:"11:00",att:95,st:"Live"},
+{id:"S4",n:"Hardware Workshop",who:"S. Patel",v:"V3",time:"14:00",att:0,st:"Upcoming"},
+{id:"S5",n:"Robotics Showcase",who:"Club RoboX",v:"V4",time:"11:30",att:210,st:"Live"},
+{id:"S6",n:"Design Sprint",who:"L. Okafor",v:"V2",time:"15:00",att:0,st:"Upcoming"}];
+const VOLS=[["Asha","Gate A"],["Ben","Gate B"],["Chen","Hall B"],["Dana",""],["Eli",""],["Farah","Arena"],["Gus",""],["Hana",""]].map((a,i)=>({id:i,n:a[0],task:a[1]}));
+const INC0=[{id:1,t:"Crowd build-up at Gate A",v:"V1",sev:"High",open:true},{id:2,t:"Projector flicker in Hall B",v:"V2",sev:"Low",open:true}];
+</script><script>const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+let E={...EVENT},S=JSON.parse(JSON.stringify(SESSIONS)),V=JSON.parse(JSON.stringify(VOLS)),auto=true,sel=null;
+let INC=INC0,ANN=[];try{INC=JSON.parse(localStorage.getItem("ep_inc")||"null")||INC0;ANN=JSON.parse(localStorage.getItem("ep_ann")||"[]")}catch(e){}
+const save=()=>{try{localStorage.setItem("ep_inc",JSON.stringify(INC));localStorage.setItem("ep_ann",JSON.stringify(ANN))}catch(e){}};
+const now=()=>new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});
+const vn=id=>VENUES.find(v=>v.id===id).n;
+function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2000)}
+function feed(t,c){const li=document.createElement("li");if(c)li.className=c;li.innerHTML=`<time>${now()}</time>${esc(t)}`;$("feed").prepend(li);while($("feed").children.length>25)$("feed").lastChild.remove()}
+const util=v=>{const a=S.filter(s=>s.v===v.id&&s.st==="Live").reduce((x,s)=>x+s.att,0);return a/v.cap};
+function kpis(){const live=S.filter(s=>s.st==="Live").length,fv=V.filter(v=>!v.task).length,oi=INC.filter(i=>i.open).length,u=Math.round(VENUES.reduce((a,v)=>a+util(v),0)/VENUES.length*100);
+ $("kpis").innerHTML=[["Registered",E.registered],["Checked in",E.checked+" ("+Math.round(E.checked/E.registered*100)+"%)"],["Active sessions",live],["Free volunteers",fv],["Open incidents",oi],["Avg venue use",u+"%"]].map(k=>`<div class="k"><b>${k[1]}</b><span>${k[0]}</span></div>`).join("")}
+function map(){let s='<path d="M5 35 H95 M50 5 V95" stroke="#e1dcf7" stroke-width="2"/>';
+ VENUES.forEach(v=>{const u=util(v),c=u>.9?"#ff4a5e":u>.6?"#ffb020":"#27c46b";s+=`<g class="v" tabindex="0" role="button" aria-label="${v.n} ${Math.round(u*100)} percent" data-v="${v.id}"><rect x="${v.x-13}" y="${v.y-8}" width="26" height="16" rx="3" fill="${c}" opacity="${.35+Math.min(u,1)*.65}" stroke="${sel===v.id?"#1b1340":"none"}" stroke-width="1"/><text x="${v.x}" y="${v.y-1}" font-size="3.2" text-anchor="middle" fill="#1b1340">${v.n}</text><text x="${v.x}" y="${v.y+4}" font-size="3.4" font-weight="700" text-anchor="middle" fill="#1b1340">${Math.round(u*100)}%</text></g>`});
+ $("map").innerHTML=s;$("map").querySelectorAll(".v").forEach(g=>{g.onclick=()=>{sel=g.dataset.v;$("q").value=vn(sel);rows();map();toast("Showing sessions in "+vn(sel))};g.onkeydown=e=>{if(e.key==="Enter")g.onclick()}})}
+function rows(){const q=$("q").value.toLowerCase(),f=$("f").value;let l=S.filter(s=>(!f||s.st===f)&&(s.n+s.who+vn(s.v)).toLowerCase().includes(q));
+ l.sort($("s").value==="att"?(a,b)=>b.att-a.att:(a,b)=>a.time.localeCompare(b.time));$("empty").hidden=l.length>0;
+ $("rows").innerHTML=l.map(s=>{const cap=VENUES.find(v=>v.id===s.v).cap;return`<tr><td>${s.time}</td><td>${s.n}<br><small>${s.who}</small></td><td>${vn(s.v)}</td><td><span class="tag ${s.st}">${s.st}</span></td><td>${s.att}/${cap}<div class="bar"><i style="width:${Math.min(100,s.att/cap*100)}%"></i></div></td></tr>`}).join("")}
+["q","f","s"].forEach(i=>$(i).addEventListener("input",()=>{if(i==="q")sel=null;rows()}));
+function incs(){const o=INC.filter(i=>i.open);$("noinc").hidden=o.length>0;$("incs").innerHTML=o.map(i=>`<li class="${i.sev==="High"?"hi":""}">${esc(i.t)} (${vn(i.v)}, ${i.sev})<button data-i="${i.id}">Resolve</button></li>`).join("")}
+$("incs").onclick=e=>{const id=e.target.dataset.i;if(!id)return;const i=INC.find(x=>x.id==id);i.open=false;save();feed("Resolved: "+i.t,"ok");toast("Incident resolved");refresh()};
+$("ia").onclick=()=>{const t=$("it").value.trim();if(!t){toast("Describe the incident first");return}INC.push({id:Date.now(),t,v:$("iv").value,sev:$("is").value,open:true});save();feed("Incident logged: "+t,"hi");$("it").value="";toast("Incident logged");refresh()};
+function anns(){$("anns").innerHTML=ANN.slice(-3).reverse().map(a=>`<li>${esc(a)}</li>`).join("")}
+$("ann").onkeydown=e=>{if(e.key==="Enter"&&e.target.value.trim()){ANN.push(e.target.value.trim());save();feed("Announcement: "+e.target.value.trim());e.target.value="";toast("Announcement sent");anns()}};
+function scan(){const n=1+Math.floor(Math.random()*3);E.checked=Math.min(E.registered,E.checked+n);feed(`QR scan: ${n} attendee${n>1?"s":""} checked in at Gate ${"AB"[Math.floor(Math.random()*2)]}`);kpis()}
+$("scan").onclick=()=>{scan();toast("QR scan simulated")};$("auto").onclick=()=>{auto=!auto;$("auto").textContent="Auto check-in: "+(auto?"on":"off");$("auto").setAttribute("aria-pressed",auto)};
+function vols(){$("vols").innerHTML=V.map(v=>`<span class="vol ${v.task?"":"free"}">${v.n}${v.task?" - "+v.task:" - free"}</span>`).join("")}
+function refresh(){kpis();map();rows();incs()}
+function ai(k){const live=S.filter(s=>s.st==="Live"),us=VENUES.map(v=>[v,util(v)]).sort((a,b)=>a[1]-b[1]),top=[...live].sort((a,b)=>b.att-a.att)[0],oi=INC.filter(i=>i.open);
+ if(k==0)return top?`${top.n} has the highest attendance: ${top.att} people in ${vn(top.v)}.`:"No sessions are live right now.";
+ if(k==1)return`${us[0][0].n} is the most underutilized at ${Math.round(us[0][1]*100)}%. Consider moving an upcoming session or open walk-ins there.`;
+ if(k==2){const h=oi.find(i=>i.sev==="High")||oi[0];return h?`Needs attention: "${h.t}" (${vn(h.v)}, ${h.sev}). ${V.filter(v=>!v.task).length} volunteers are free to assist.`:"No open incidents. Check venues above 90% utilization."}
+ return`${E.checked} of ${E.registered} registered have checked in. ${live.length} sessions live, ${oi.length} open incidents, ${V.filter(v=>!v.task).length} volunteers free. Busiest: ${top?top.n:"none live"}. (Simulated.)`}
+$("chips").innerHTML=["Which session has the highest attendance?","Which venue is underutilized?","What event needs attention?","Summarize today's event activity."].map((x,i)=>`<button data-i="${i}">${x}</button>`).join("");
+$("chips").onclick=e=>{if(e.target.dataset.i)$("out").textContent=ai(+e.target.dataset.i)};
+function sim(){if(auto)scan();S.filter(s=>s.st==="Live").forEach(s=>{const cap=VENUES.find(v=>v.id===s.v).cap;s.att=Math.max(10,Math.min(cap,s.att+Math.round((Math.random()-.45)*14)))});
+ const hot=VENUES.find(v=>util(v)>.9);if(hot&&Math.random()<.2)feed(`Alert: ${hot.n} above 90% capacity`,"hi");
+ const m=["Speaker arrived at Hall B","Volunteer check-in complete","Lunch queue is moving","Wi-Fi load normal"];if(Math.random()<.2)feed(m[Math.floor(Math.random()*4)]);kpis();map();rows()}
+VENUES.forEach(v=>$("iv").add(new Option(v.n,v.id)));
+setInterval(()=>$("clock").textContent=now(),1000);
+setTimeout(()=>{if(location.search.includes("error")){$("state").innerHTML='Event feed unavailable. <button onclick="location.href=location.pathname">Retry</button>';return}
+ $("state").hidden=true;$("main").hidden=false;vols();anns();feed("Live feed connected","ok");refresh();setInterval(sim,2500)},700);
+</script></body></html>

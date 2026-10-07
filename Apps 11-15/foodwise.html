@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FoodWise AI — Waste Intelligence</title><style>:root{--bg:#eef3ea;--ink:#1d2b1f;--leaf:#2f7d3a;--tom:#d1432f;--tur:#e6a817;--plum:#6a2e4f;--card:#fff;--line:#d3dccf;--muted:#566657;--soft:#dfeadb;font-family:"Trebuchet MS","Segoe UI",sans-serif}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#101a12;--ink:#e5f0e3;--card:#17251a;--line:#2b4230;--muted:#9db39f;--soft:#1f3524;--leaf:#6fcf7b}}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--card);padding:8px}
+:focus-visible{outline:3px solid var(--tur);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top,0px)) clamp(12px,3vw,32px) 14px;border-bottom:2px solid var(--leaf)}
+h1{margin:0;font-size:1.5rem;color:var(--leaf)}.top p{margin:0;color:var(--muted)}h2{margin:0 0 12px;font-size:1.05rem}
+.badge{background:var(--tur);color:#2b1f00;padding:6px 10px;border-radius:6px;font-weight:700;font-size:.8rem}
+.btn{background:var(--leaf);color:#fff;border:0;padding:9px 14px;border-radius:8px;font:inherit;cursor:pointer}
+main{padding:clamp(12px,3vw,32px);max-width:1280px;margin:auto}
+.state{padding:24px;text-align:center;color:var(--muted)}.state.err{color:var(--tom);font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-bottom:4px solid var(--leaf);padding:12px;border-radius:8px}.kpi.w{border-bottom-color:var(--tom)}
+.kpi b{font-size:1.5rem;display:block}.kpi span{color:var(--muted);font-size:.85rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.wide{grid-column:1/-1}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+svg{width:100%;height:auto}.muted{color:var(--muted);font-size:.85rem}
+.stock{list-style:none;margin:0;padding:0}.stock li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.pill{padding:2px 8px;border-radius:99px;font-size:.78rem;background:var(--soft)}.pill.hot{background:var(--tom);color:#fff}.pill.mid{background:var(--tur);color:#2b1f00}
+.tools{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:12px}.tools label{display:grid;gap:4px;font-size:.85rem}
+input,select{padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.log{max-height:230px;overflow:auto;display:grid;gap:8px;margin-bottom:10px}.m{padding:9px 12px;border-radius:10px;max-width:90%}.m.u{background:var(--leaf);color:#fff;justify-self:end}.m.b{background:var(--soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.chips button{border:1px solid var(--leaf);background:none;color:var(--ink);border-radius:99px;padding:5px 12px;cursor:pointer;font:inherit}
+#ask{display:flex;gap:8px}#ask input{flex:1}
+#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translate(-50%,90px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;transition:transform .3s}#toast.show{transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div><h1>FoodWise AI</h1><p>Kitchen waste intelligence for dining halls</p></div><span class="badge">SIMULATED RESTAURANT DATA</span><button id="reload" class="btn">Reload</button></header>
+<main id="main"><div id="state" class="state" role="status">Loading kitchen data…</div>
+<section id="app" hidden>
+<div class="kpis" id="kpis"></div>
+<div class="grid">
+<section class="card"><h2>Daily food waste (week)</h2><div id="trend"></div></section>
+<section class="card"><h2>Demand forecast</h2><div id="fc"></div><p class="muted">Simulated model; confidence falls with horizon.</p></section>
+<section class="card"><h2>Waste cost by category</h2><div id="cat"></div></section>
+<section class="card"><h2>Ingredients needing attention</h2><ul id="stock" class="stock"></ul></section>
+<section class="card wide"><h2>Dishes</h2>
+<div class="tools"><label>Search<input id="q" type="search" placeholder="Dish name"></label><label>Category<select id="fc2"><option value="">All</option></select></label><label>Sort<select id="so"><option value="wcost">Waste cost</option><option value="wpct">Waste %</option><option value="n">Name</option></select></label></div>
+<div class="scroll"><table><thead><tr><th>Dish</th><th>Category</th><th>Prepared</th><th>Sold</th><th>Waste</th><th>Cost</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p id="empty" class="state" hidden>No dishes match. Clear the search or pick “All”.</p>
+<form id="add" class="tools"><label>Log extra waste<select id="wd"></select></label><label>Portions<input id="wn" type="number" min="1" max="100" value="5" required></label><button class="btn">Log waste</button></form></section>
+<section class="card wide ai"><h2>Waste assistant</h2><div id="log" class="log" aria-live="polite"></div><div class="chips" id="chips"></div>
+<form id="ask"><input id="msg" aria-label="Ask a question" placeholder="Ask about waste, demand or ingredients…"><button class="btn">Ask</button></form></section>
+</div></section></main><div id="toast" role="status" aria-live="polite"></div>
+<script>// SIMULATED restaurant data — not real.
+const DISHES=[{n:"Veg Biryani",c:"Mains",p:120,s:96,u:2.1},{n:"Paneer Wrap",c:"Mains",p:80,s:74,u:1.8},{n:"Dal Tadka",c:"Mains",p:100,s:71,u:0.9},{n:"Fresh Salad Bowl",c:"Sides",p:60,s:31,u:1.2},{n:"Idli Plate",c:"Breakfast",p:140,s:132,u:0.6},{n:"Fruit Cup",c:"Desserts",p:70,s:38,u:1.1},{n:"Gulab Jamun",c:"Desserts",p:90,s:79,u:0.8},{n:"Masala Chai",c:"Drinks",p:200,s:188,u:0.3}];
+const TREND={days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],waste:[41,38,45,36,52,48,33],eaten:[310,322,298,340,360,372,280]};
+const FORECAST={days:["Tomorrow","+2d","+3d"],demand:[355,392,301],conf:[88,81,74]};
+const STOCK=[{n:"Tomatoes",kg:18,left:2},{n:"Spinach",kg:9,left:1},{n:"Paneer",kg:12,left:4},{n:"Rice",kg:80,left:90},{n:"Yogurt",kg:14,left:3},{n:"Bananas",kg:11,left:2},{n:"Lentils",kg:40,left:120}];
+const $=s=>document.querySelector(s),KEY="foodwise-extra";let extra={};
+const toast=m=>{const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2400)};
+const D=()=>DISHES.map(d=>{const w=d.p-d.s+(extra[d.n]||0);return{...d,w,wpct:Math.round(w/d.p*100),wcost:Math.round(w*d.u*10)/10}});
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const sustain=()=>{const d=D();return Math.max(0,Math.round(100-sum(d,x=>x.w)/sum(d,x=>x.p)*250))};
+function kpis(){const d=D(),top=[...d].sort((a,b)=>b.wcost-a.wcost)[0],risky=STOCK.filter(s=>s.left<=2).length;
+ const k=[["Today's waste",sum(d,x=>x.w)+" portions",0],["Waste cost","$"+sum(d,x=>x.wcost).toFixed(0),0],["Most wasted",top.n,1],["Predicted demand",FORECAST.demand[0]+" portions",0],["Inventory health",(STOCK.length-risky)+"/"+STOCK.length+" safe",risky>2],["Sustainability",sustain()+"/100",sustain()<60]];
+ $("#kpis").innerHTML=k.map(([l,v,w])=>`<div class="kpi ${w?"w":""}"><b>${v}</b><span>${l}</span></div>`).join("")}
+function trend(){const W=480,H=210,p=30,n=7,mx=60,x=i=>p+i*(W-2*p)/(n-1),y=v=>H-p-v/mx*(H-2*p);
+ $("#trend").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly waste in kg, simulated">${TREND.days.map((t,i)=>`<rect x="${x(i)-14}" y="${y(TREND.waste[i])}" width="28" height="${H-p-y(TREND.waste[i])}" fill="${TREND.waste[i]>45?"var(--tom)":"var(--leaf)"}" rx="3"/><text x="${x(i)}" y="${H-10}" font-size="11" text-anchor="middle" fill="currentColor">${t}</text><text x="${x(i)}" y="${y(TREND.waste[i])-5}" font-size="11" text-anchor="middle" fill="currentColor">${TREND.waste[i]}</text>`).join("")}</svg><p class="muted">Bars: kg wasted per day. Red = above 45 kg.</p>`}
+function fc(){const W=480,H=170,mx=420;$("#fc").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Demand forecast">${FORECAST.days.map((d,i)=>{const w=FORECAST.demand[i]/mx*300,y=15+i*50;return`<text x="0" y="${y+18}" font-size="12" fill="currentColor">${d}</text><rect x="75" y="${y}" width="${w}" height="26" rx="4" fill="var(--plum)" opacity="${FORECAST.conf[i]/100}"/><text x="${80+w}" y="${y+18}" font-size="12" fill="currentColor">${FORECAST.demand[i]} (${FORECAST.conf[i]}% conf.)</text>`}).join("")}</svg>`}
+function cat(){const m={};D().forEach(d=>m[d.c]=(m[d.c]||0)+d.wcost);const mx=Math.max(...Object.values(m));
+ $("#cat").innerHTML=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="margin:8px 0"><span>${k} — $${v.toFixed(1)}</span><div style="height:10px;background:var(--soft);border-radius:5px"><div style="height:100%;width:${v/mx*100}%;background:var(--tur);border-radius:5px"></div></div></div>`).join("")}
+function stock(){$("#stock").innerHTML=[...STOCK].sort((a,b)=>a.left-b.left).slice(0,5).map(s=>`<li><span>${s.n} · ${s.kg} kg</span><span class="pill ${s.left<=2?"hot":s.left<=4?"mid":""}">${s.left<=2?"Use today":s.left+" days left"}</span></li>`).join("")}
+function rows(){const q=$("#q").value.toLowerCase(),c=$("#fc2").value,s=$("#so").value;
+ const r=D().filter(d=>(!c||d.c===c)&&d.n.toLowerCase().includes(q)).sort((a,b)=>s==="n"?a.n.localeCompare(b.n):b[s]-a[s]);
+ $("#empty").hidden=r.length>0;$("#rows").innerHTML=r.map(d=>`<tr><td>${d.n}</td><td>${d.c}</td><td>${d.p}</td><td>${d.s}</td><td><span class="pill ${d.wpct>35?"hot":d.wpct>15?"mid":""}">${d.w} (${d.wpct}%)</span></td><td>$${d.wcost}</td></tr>`).join("")}
+["#q","#fc2","#so"].forEach(s=>$(s).addEventListener("input",rows));
+$("#add").addEventListener("submit",e=>{e.preventDefault();const n=$("#wd").value;extra[n]=(extra[n]||0)+ +$("#wn").value;try{localStorage.setItem(KEY,JSON.stringify(extra))}catch(err){}render();toast("Logged "+$("#wn").value+" portions of "+n)});
+const say=(t,c)=>{const l=$("#log");l.insertAdjacentHTML("beforeend",`<div class="m ${c}"></div>`);l.lastElementChild.textContent=t;l.scrollTop=l.scrollHeight};
+function answer(q){q=q.toLowerCase();const d=D().sort((a,b)=>b.wcost-a.wcost);
+ if(/dish|most|waste/.test(q)&&!/reduce|how/.test(q))return `${d[0].n} creates the most waste cost: ${d[0].w} portions (${d[0].wpct}%), about $${d[0].wcost}. ${d[1].n} is next.`;
+ if(/predict|demand|tomorrow|forecast/.test(q))return `Simulated forecast: about ${FORECAST.demand[0]} portions tomorrow (${FORECAST.conf[0]}% confidence), rising to ${FORECAST.demand[1]} in two days. Prepare ${d[0].n} about ${Math.round(d[0].wpct/2)}% fewer portions than today.`;
+ if(/reduce|how/.test(q))return `1) Cut ${d[0].n} and ${d[1].n} batch sizes by about 15%. 2) Cook in smaller, staggered batches. 3) Move short-dated stock (${STOCK.filter(s=>s.left<=2).map(s=>s.n).join(", ")}) into today's specials.`;
+ if(/ingredient|stock|expir/.test(q)){const r=STOCK.filter(s=>s.left<=2);return `Use today: ${r.map(s=>s.n+" ("+s.kg+" kg)").join(", ")}. They expire within 2 days.`}
+ return "Try: which dish creates the most waste, predict tomorrow's demand, how to reduce waste, or which ingredients need attention."}
+$("#ask").addEventListener("submit",e=>{e.preventDefault();const v=$("#msg").value.trim();if(!v)return;say(v,"u");$("#msg").value="";setTimeout(()=>say(answer(v),"b"),300)});
+["Which dish creates the most waste?","Predict tomorrow's food demand.","How can we reduce waste?","Which ingredients need attention?"].forEach(t=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>{$("#msg").value=t;$("#ask").requestSubmit()};$("#chips").append(b)});
+function render(){kpis();rows();cat()}
+function init(){const st=$("#state");st.hidden=false;st.className="state";st.textContent="Loading kitchen data…";$("#app").hidden=true;
+ new Promise((ok,no)=>setTimeout(()=>{try{if(typeof DISHES==="undefined")throw 0;try{extra=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){extra={}}ok()}catch(e){no()}},600)).then(()=>{st.hidden=true;$("#app").hidden=false;
+ if($("#fc2").length<2){[...new Set(DISHES.map(d=>d.c))].forEach(c=>$("#fc2").add(new Option(c,c)));DISHES.forEach(d=>$("#wd").add(new Option(d.n,d.n)))}
+ render();trend();fc();stock();if(!$("#log").children.length)say("Hi! Ask about waste, demand or ingredients. All data is simulated.","b")})
+ .catch(()=>{st.className="state err";st.textContent="Could not load data. Check data/data.js, then press Reload."})}
+$("#reload").onclick=()=>{try{localStorage.removeItem(KEY)}catch(e){}extra={};init();toast("Data reloaded")};
+init();
+</script></body></html>
