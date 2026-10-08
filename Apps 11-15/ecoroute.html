@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EcoRoute — Compare routes by carbon</title><style>:root{--bg:#eaf1f4;--ink:#0e2a3a;--lime:#7fb82a;--sky:#2f8fd8;--org:#e8791c;--card:#fff;--line:#cfdce3;--muted:#51697a;--soft:#dfeaf0;font-family:"Segoe UI",system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1a23;--ink:#e3f0f6;--card:#122733;--line:#25414f;--muted:#9bb6c4;--soft:#183240;--lime:#a5e14a;--sky:#59b2f0}}
+*{box-sizing:border-box}html,body{margin:0;color:var(--ink);overflow-x:hidden}
+body{background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/48px 48px,var(--bg)}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--card);padding:8px}
+:focus-visible{outline:3px solid var(--org);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top,0px)) clamp(12px,3vw,32px) 14px;background:var(--ink);color:#fff}
+h1{margin:0;font-size:1.5rem;color:var(--lime)}.top p{margin:0;opacity:.8}h2{margin:0 0 12px;font-size:1.05rem}
+.badge{background:var(--org);color:#fff;padding:6px 10px;border-radius:6px;font-weight:700;font-size:.8rem}
+.btn{background:var(--ink);color:#fff;border:0;padding:10px 14px;border-radius:8px;font:inherit;cursor:pointer}
+@media(prefers-color-scheme:dark){.btn{background:var(--lime);color:#0b1a23}}
+main{padding:clamp(12px,3vw,32px);max-width:1200px;margin:auto;display:grid;gap:16px}
+.plan{display:flex;flex-wrap:wrap;gap:12px;align-items:end;background:var(--card);border:1px solid var(--line);padding:16px;border-radius:12px}
+.plan label,.tools label{display:grid;gap:4px;font-size:.85rem;flex:1 1 150px}
+input,select{padding:9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;width:100%}
+.state{padding:20px;text-align:center;color:var(--muted)}.state.err{color:#c4321c;font-weight:700}
+.split{display:grid;grid-template-columns:2fr 1fr;gap:16px}@media(max-width:860px){.split{grid-template-columns:1fr}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.rc{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:14px;text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.rc[aria-pressed=true]{border-color:var(--lime);box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 35%,transparent)}
+.rc h3{margin:0 0 2px}.rc small{color:var(--muted)}.rc dl{display:grid;grid-template-columns:auto auto;gap:2px 10px;margin:10px 0 0}.rc dd{margin:0;text-align:right;font-weight:600}
+.tag{display:inline-block;background:var(--lime);color:#10230a;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;margin-bottom:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+svg{width:100%;height:auto}.muted{color:var(--muted);font-size:.9rem}
+.bar{display:grid;grid-template-columns:130px 1fr 70px;gap:8px;align-items:center;margin:8px 0;font-size:.9rem}.bar div{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}.bar i{display:block;height:100%;border-radius:7px;transition:width .7s}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.hist{list-style:none;margin:0;padding:0}.hist li{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}.hist button{border:1px solid var(--line);background:none;color:var(--ink);border-radius:6px;cursor:pointer}
+.log{max-height:220px;overflow:auto;display:grid;gap:8px;margin-bottom:10px}.m{padding:9px 12px;border-radius:10px;max-width:90%}.m.u{background:var(--ink);color:#fff;justify-self:end}.m.b{background:var(--soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.chips button{border:1px solid var(--sky);background:none;color:var(--ink);border-radius:99px;padding:5px 12px;cursor:pointer;font:inherit}
+#ask{display:flex;gap:8px}#ask input{flex:1}
+#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translate(-50%,90px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;transition:transform .3s}#toast.show{transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div><h1>EcoRoute</h1><p>Pick the route that fits your time, wallet and planet</p></div><span class="badge">SIMULATED ROUTE DATA</span></header>
+<main id="main">
+<form id="f" class="plan"><label>From<input id="from" list="pl" value="Chengalpattu" required></label><label>To<input id="to" list="pl" value="Chennai Central" required></label>
+<label>Transport<select id="mode"><option value="">Any</option><option value="car">Car</option><option value="transit">Public transit</option><option value="bike">Bike / rail</option></select></label>
+<label>Priority<select id="pref"><option value="time">Fastest</option><option value="cost">Cheapest</option><option value="co2" selected>Lowest carbon</option></select></label>
+<button class="btn">Compare routes</button><datalist id="pl"></datalist></form>
+<div id="state" class="state" role="status">Enter a trip to compare routes.</div>
+<section id="res" hidden>
+<div class="split"><div><h2 id="sum"></h2><div id="cards" class="cards"></div></div>
+<aside class="card"><h2>Trip summary</h2><div id="meter"></div><div id="detail"></div><button id="save" class="btn">Save this trip</button></aside></div>
+<section class="card"><h2>Carbon per route</h2><div id="co2bars"></div></section>
+<section class="card"><h2>Route comparison</h2><div class="scroll"><table><thead><tr><th>Route</th><th>Distance</th><th>Time</th><th>Cost</th><th>CO₂</th><th>Score</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+</section>
+<section class="card"><h2>Saved trips</h2><ul id="hist" class="hist"></ul><p id="hempty" class="muted">No saved trips yet. Compare a route and press “Save this trip”.</p></section>
+<section class="card"><h2>Route assistant</h2><div id="log" class="log" aria-live="polite"></div><div id="chips" class="chips"></div>
+<form id="ask"><input id="msg" aria-label="Ask a question" placeholder="Ask about carbon, savings or routes…"><button class="btn">Ask</button></form></section>
+</main><div id="toast" role="status" aria-live="polite"></div>
+<script>// SIMULATED route data — distances are derived from place names, not real maps.
+const PLACES=["Chennai Central","Chengalpattu","Tambaram","Guindy","Mahabalipuram","Kanchipuram","Pondicherry","Vellore","Airport","T Nagar"];
+// per-km: speed km/h, cost INR, kg CO2, detour factor
+const MODES={fastest:{name:"Fastest",how:"Car via highway",spd:60,cost:9,co2:.17,dist:1,toll:40,cat:"car"},
+cheapest:{name:"Cheapest",how:"Local bus",spd:32,cost:1.4,co2:.06,dist:1.08,toll:0,cat:"transit"},
+lowcarbon:{name:"Lowest carbon",how:"Electric train + cycle",spd:38,cost:1.9,co2:.02,dist:1.12,toll:0,cat:"bike"},
+transit:{name:"Public transport",how:"Metro + bus",spd:42,cost:2.6,co2:.04,dist:1.1,toll:0,cat:"transit"}};
+const $=s=>document.querySelector(s),KEY="ecoroute-trips";let routes=[],sel=null,trip=null,hist=[];
+const toast=m=>{const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2400)};
+const km=(a,b)=>{const s=[a,b].map(x=>x.toLowerCase().trim()).sort().join("|");let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%997;return 6+h%48};
+const score=r=>Math.max(5,Math.round(100-r.co2perkm/.17*85));
+function calc(a,b){const d=km(a,b);return Object.entries(MODES).map(([k,m])=>{const dist=Math.round(d*m.dist*10)/10;return{k,...m,dist,time:Math.round(dist/m.spd*60),cost:Math.round(dist*m.cost+m.toll),co2perkm:m.co2,co2:Math.round(dist*m.co2*10)/10,score:score({co2perkm:m.co2})}})}
+const fmt=m=>m>=60?Math.floor(m/60)+"h "+m%60+"m":m+" min";
+function best(){const p=$("#pref").value;return [...routes].sort((a,b)=>a[p]-b[p])[0]}
+function show(){const mode=$("#mode").value,list=routes.filter(r=>!mode||r.cat===mode);
+ if(!list.length){$("#res").hidden=true;$("#state").hidden=false;$("#state").className="state";$("#state").textContent="No route matches that transport type. Choose “Any”.";return}
+ $("#state").hidden=true;$("#res").hidden=false;const b=best();if(!sel||!list.includes(sel))sel=list.includes(b)?b:list[0];
+ $("#sum").textContent=`${trip.a} → ${trip.b} · ${routes[0].dist} km (simulated)`;
+ $("#cards").innerHTML=list.map(r=>`<button class="rc" data-k="${r.k}" aria-pressed="${r===sel}">${r===b?'<span class="tag">Recommended</span>':""}<h3>${r.name}</h3><small>${r.how}</small><dl><dt>Time</dt><dd>${fmt(r.time)}</dd><dt>Cost</dt><dd>₹${r.cost}</dd><dt>CO₂</dt><dd>${r.co2} kg</dd><dt>Distance</dt><dd>${r.dist} km</dd></dl></button>`).join("");
+ const mx=Math.max(...routes.map(r=>r.co2));
+ $("#co2bars").innerHTML=routes.map(r=>`<div class="bar"><span>${r.name}</span><div><i style="width:${r.co2/mx*100}%;background:${r.co2>mx*.6?"var(--org)":"var(--lime)"}"></i></div><b>${r.co2} kg</b></div>`).join("");
+ $("#rows").innerHTML=routes.map(r=>`<tr><td>${r.name}</td><td>${r.dist} km</td><td>${fmt(r.time)}</td><td>₹${r.cost}</td><td>${r.co2} kg</td><td>${r.score}/100</td></tr>`).join("");
+ meter()}
+function meter(){const r=sel,f=routes[0],saved=Math.round((f.co2-r.co2)*10)/10,a=Math.PI*(1-r.score/100),x=60+50*Math.cos(a),y=65-50*Math.sin(a);
+ $("#meter").innerHTML=`<svg viewBox="0 0 120 80" role="img" aria-label="Sustainability score ${r.score} of 100"><path d="M10 65A50 50 0 0 1 110 65" fill="none" stroke="var(--soft)" stroke-width="10" stroke-linecap="round"/><path d="M10 65A50 50 0 0 1 ${x} ${y}" fill="none" stroke="var(--lime)" stroke-width="10" stroke-linecap="round"/><text x="60" y="62" text-anchor="middle" font-size="20" font-weight="700" fill="currentColor">${r.score}</text><text x="60" y="76" text-anchor="middle" font-size="7" fill="currentColor">sustainability score</text></svg>`;
+ $("#detail").innerHTML=`<p><b>${r.name}</b> — ${r.how}</p><p>${fmt(r.time)} · ₹${r.cost} · ${r.co2} kg CO₂</p><p class="muted">${saved>0?`Saves ${saved} kg CO₂ vs. the fastest route (≈ ${Math.round(saved/(21/365))} tree-days of absorption).`:"This is the fastest, highest-carbon option."}</p>`}
+$("#cards").addEventListener("click",e=>{const b=e.target.closest(".rc");if(!b)return;sel=routes.find(r=>r.k===b.dataset.k);show()});
+$("#f").addEventListener("submit",e=>{e.preventDefault();const a=$("#from").value.trim(),b=$("#to").value.trim(),st=$("#state");$("#res").hidden=true;st.hidden=false;
+ if(a.toLowerCase()===b.toLowerCase()){st.className="state err";st.textContent="Start and destination are the same. Enter two different places.";return}
+ st.className="state";st.textContent="Comparing routes…";
+ setTimeout(()=>{trip={a,b};routes=calc(a,b);sel=null;show();toast("Routes compared")},600)});
+function drawHist(){$("#hempty").hidden=hist.length>0;$("#hist").innerHTML=hist.map((h,i)=>`<li><span>${h.a} → ${h.b} · ${h.name} · ${h.co2} kg</span><button data-i="${i}" aria-label="Remove trip">✕</button></li>`).join("")}
+$("#save").onclick=()=>{hist.unshift({a:trip.a,b:trip.b,name:sel.name,co2:sel.co2});hist=hist.slice(0,6);try{localStorage.setItem(KEY,JSON.stringify(hist))}catch(e){}drawHist();toast("Trip saved")};
+$("#hist").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;hist.splice(+b.dataset.i,1);try{localStorage.setItem(KEY,JSON.stringify(hist))}catch(e){}drawHist();toast("Trip removed")});
+const say=(t,c)=>{const l=$("#log");l.insertAdjacentHTML("beforeend",`<div class="m ${c}"></div>`);l.lastElementChild.textContent=t;l.scrollTop=l.scrollHeight};
+function answer(q){q=q.toLowerCase();if(!routes.length)return "Compare a trip first, then ask me about it.";const lc=[...routes].sort((a,b)=>a.co2-b.co2)[0],f=routes[0];
+ if(/environment|greenest|carbon|co2/.test(q)&&!/save/.test(q))return `${lc.name} (${lc.how}) is best for the environment: ${lc.co2} kg CO₂ over ${lc.dist} km, score ${lc.score}/100.`;
+ if(/save|saving/.test(q))return `Choosing ${lc.name} instead of the fastest route saves ${Math.round((f.co2-lc.co2)*10)/10} kg CO₂ but takes ${lc.time-f.time} more minutes.`;
+ if(/compare|all/.test(q))return routes.map(r=>`${r.name}: ${fmt(r.time)}, ₹${r.cost}, ${r.co2} kg`).join(" | ");
+ return "Try: which route is best for the environment, how much carbon can I save, or compare all routes."}
+$("#ask").addEventListener("submit",e=>{e.preventDefault();const v=$("#msg").value.trim();if(!v)return;say(v,"u");$("#msg").value="";setTimeout(()=>say(answer(v),"b"),300)});
+["Which route is best for the environment?","How much carbon can I save?","Compare all available routes."].forEach(t=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>{$("#msg").value=t;$("#ask").requestSubmit()};$("#chips").append(b)});
+["#mode","#pref"].forEach(s=>$(s).addEventListener("change",()=>{if(routes.length){sel=null;show()}}));
+try{hist=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){hist=[]}
+PLACES.forEach(p=>$("#pl").append(new Option(p)));drawHist();say("Hi! Compare a trip, then ask me about carbon and savings. All routes are simulated.","b");
+</script></body></html>
