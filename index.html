@@ -6,202 +6,275 @@
   <title>UI Templates App - Master Index</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --bg-2: #111827;
-      --card: #ffffff;
-      --card-soft: #eef2ff;
-      --primary: #2563eb;
-      --primary-2: #7c3aed;
-      --accent: #14b8a6;
-      --text: #0f172a;
-      --muted: #475569;
-      --line: #e2e8f0;
-      --shadow: rgba(15, 23, 42, 0.12);
+      --bg-primary: #0a0e27;
+      --bg-secondary: #151b35;
+      --bg-glass: rgba(255, 255, 255, 0.05);
+      --border-glass: rgba(255, 255, 255, 0.1);
+      --text-primary: #ffffff;
+      --text-secondary: #b0bcc4;
+      --accent-1: #00d9ff;
+      --accent-2: #ff006e;
+      --accent-3: #8338ec;
+      --accent-4: #fb5607;
+      --accent-5: #ffbe0b;
+      --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+      --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.5);
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #dbeafe, #f8fafc 40%, #e0f2fe);
-      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
     .container {
-      max-width: 1360px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 32px 20px 60px;
+      padding: 40px 20px 60px;
     }
 
     .topbar {
-      background: linear-gradient(135deg, #0f172a, #1e3a8a 60%, #312e81);
-      color: white;
-      border-radius: 22px;
-      padding: 36px 28px;
-      box-shadow: 0 18px 45px var(--shadow);
-      margin-bottom: 30px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 48px 36px;
+      box-shadow: var(--shadow-glass);
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .topbar::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--accent-1), transparent);
+      opacity: 0.1;
+      pointer-events: none;
     }
 
     .topbar h1 {
-      margin: 0 0 10px;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      letter-spacing: 0.04em;
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
     }
 
     .topbar p {
-      margin: 0;
-      font-size: 1.04rem;
-      color: rgba(255,255,255,0.9);
+      margin: 0 0 24px;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
     }
 
     .stats {
-      margin-top: 18px;
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 12px;
     }
 
     .pill {
-      background: rgba(255,255,255,0.14);
-      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0, 217, 255, 0.08);
+      border: 1px solid rgba(0, 217, 255, 0.2);
       border-radius: 999px;
-      padding: 10px 16px;
-      font-weight: 700;
+      padding: 12px 18px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-1);
+      backdrop-filter: blur(10px);
     }
 
     .section {
-      margin-top: 42px;
+      margin-top: 50px;
     }
 
     .section h2 {
-      margin: 0 0 18px;
-      font-size: clamp(1.4rem, 3vw, 2.1rem);
-      color: #0f172a;
-      border-bottom: 3px solid #93c5fd;
-      padding-bottom: 10px;
+      margin: 0 0 24px;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+      font-weight: 700;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-glass);
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 18px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 8px 25px var(--shadow);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-glass);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
     }
 
     .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.16);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--accent-1);
     }
 
     .card-head {
-      padding: 16px 18px;
+      padding: 20px;
       color: white;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 78px;
+      min-height: 100px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .card-head.primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); }
-    .card-head.success { background: linear-gradient(135deg, #0f766e, #14b8a6); }
-    .card-head.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .card-head.purple { background: linear-gradient(135deg, #7c3aed, #a855f7); }
-    .card-head.dark { background: linear-gradient(135deg, #374151, #111827); }
-    .card-head.red { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+    .card-head::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--gradient);
+      opacity: 0.9;
+      z-index: -1;
+    }
+
+    .card-head.primary { --gradient: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); }
+    .card-head.success { --gradient: linear-gradient(135deg, #00ff88 0%, #00cc66 100%); }
+    .card-head.orange { --gradient: linear-gradient(135deg, #fb5607 0%, #ff8c00 100%); }
+    .card-head.purple { --gradient: linear-gradient(135deg, #8338ec 0%, #b344ff 100%); }
+    .card-head.dark { --gradient: linear-gradient(135deg, #404554 0%, #1a1f2e 100%); }
+    .card-head.red { --gradient: linear-gradient(135deg, #ff006e 0%, #cc0055 100%); }
 
     .num {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
       display: grid;
       place-items: center;
-      background: rgba(255,255,255,0.18);
-      font-weight: 700;
-      font-size: 1.2rem;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      font-weight: 800;
+      font-size: 1.3rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .title {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 700;
       margin: 0;
+      letter-spacing: 0.01em;
     }
 
     .subtitle {
-      margin: 4px 0 0;
-      opacity: 0.88;
-      font-size: 0.82rem;
+      margin: 6px 0 0;
+      opacity: 0.85;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .card-body {
-      padding: 18px 18px 20px;
+      padding: 24px 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .desc {
-      margin: 0 0 14px;
-      color: var(--muted);
-      line-height: 1.6;
-      min-height: 76px;
+      margin: 0 0 16px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      min-height: 60px;
       font-size: 0.95rem;
+      flex-grow: 1;
     }
 
     .meta {
-      margin: 0 0 16px;
-      color: #64748b;
+      margin: 0 0 18px;
+      color: #8b97aa;
       font-size: 0.75rem;
-      background: #f8fafc;
-      border: 1px solid var(--line);
-      border-left: 4px solid var(--primary);
+      background: rgba(0, 217, 255, 0.05);
+      border: 1px solid rgba(0, 217, 255, 0.1);
+      border-left: 3px solid var(--accent-1);
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 10px 12px;
       word-break: break-word;
+      font-family: 'Courier New', monospace;
     }
 
     .actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      margin-top: auto;
     }
 
     .btn {
       display: inline-block;
       text-decoration: none;
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-radius: 12px;
+      padding: 11px 16px;
       font-weight: 700;
       font-size: 0.9rem;
-      transition: transform 0.2s ease, opacity 0.2s ease;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
     }
 
-    .btn:hover { transform: translateY(-1px); }
+    .btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 217, 255, 0.3);
+    }
 
     .btn.primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
-      color: white;
+      background: linear-gradient(135deg, var(--accent-1), #0099cc);
+      color: var(--bg-primary);
+      font-weight: 700;
+      border-color: var(--accent-1);
     }
 
     footer {
-      margin-top: 38px;
+      margin-top: 50px;
       text-align: center;
-      padding: 24px 12px 0;
-      color: var(--muted);
-      font-size: 0.9rem;
+      padding: 30px 12px 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      border-top: 1px solid var(--border-glass);
     }
 
-    @media (max-width: 640px) {
-      .container { padding-left: 14px; padding-right: 14px; }
-      .topbar { padding: 26px 18px; }
+    @media (max-width: 768px) {
+      .container { padding: 24px 16px 40px; }
+      .topbar { padding: 32px 20px; }
       .stats { flex-direction: column; align-items: flex-start; }
       .actions { flex-direction: column; }
       .btn { width: 100%; text-align: center; }
+      .grid { grid-template-columns: 1fr; }
+      .card-head { min-height: 80px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
     }
   </style>
 </head>
@@ -218,11 +291,11 @@
     </header>
 
     <section class="section">
-      <h2>Apps 1–5</h2>
+      <h2>Apps 1–5 (Person E)</h2>
       <div class="grid">
         <article class="card">
           <div class="card-head primary">
-            <div><p class="title">CampusIQ</p><p class="subtitle">Person A</p></div>
+            <div><p class="title">CampusIQ</p><p class="subtitle">Person E</p></div>
             <div class="num">1</div>
           </div>
           <div class="card-body">
@@ -234,7 +307,7 @@
 
         <article class="card">
           <div class="card-head success">
-            <div><p class="title">ClimatePulse</p><p class="subtitle">Person A</p></div>
+            <div><p class="title">ClimatePulse</p><p class="subtitle">Person E</p></div>
             <div class="num">2</div>
           </div>
           <div class="card-body">
@@ -246,7 +319,7 @@
 
         <article class="card">
           <div class="card-head orange">
-            <div><p class="title">MoneyPilot</p><p class="subtitle">Person A</p></div>
+            <div><p class="title">MoneyPilot</p><p class="subtitle">Person E</p></div>
             <div class="num">3</div>
           </div>
           <div class="card-body">
@@ -258,7 +331,7 @@
 
         <article class="card">
           <div class="card-head purple">
-            <div><p class="title">FitSense</p><p class="subtitle">Person A</p></div>
+            <div><p class="title">FitSense</p><p class="subtitle">Person E</p></div>
             <div class="num">4</div>
           </div>
           <div class="card-body">
@@ -270,7 +343,7 @@
 
         <article class="card">
           <div class="card-head dark">
-            <div><p class="title">CityPulse</p><p class="subtitle">Person A</p></div>
+            <div><p class="title">CityPulse</p><p class="subtitle">Person E</p></div>
             <div class="num">5</div>
           </div>
           <div class="card-body">
@@ -283,11 +356,11 @@
     </section>
 
     <section class="section">
-      <h2>Apps 6–10</h2>
+      <h2>Apps 6–10 (Person E)</h2>
       <div class="grid">
         <article class="card">
           <div class="card-head primary">
-            <div><p class="title">ResearchLens</p><p class="subtitle">Person B</p></div>
+            <div><p class="title">ResearchLens</p><p class="subtitle">Person E</p></div>
             <div class="num">6</div>
           </div>
           <div class="card-body">
@@ -299,7 +372,7 @@
 
         <article class="card">
           <div class="card-head success">
-            <div><p class="title">CyberShield</p><p class="subtitle">Person B</p></div>
+            <div><p class="title">CyberShield</p><p class="subtitle">Person E</p></div>
             <div class="num">7</div>
           </div>
           <div class="card-body">
@@ -311,7 +384,7 @@
 
         <article class="card">
           <div class="card-head orange">
-            <div><p class="title">CareerPilot</p><p class="subtitle">Person B</p></div>
+            <div><p class="title">CareerPilot</p><p class="subtitle">Person E</p></div>
             <div class="num">8</div>
           </div>
           <div class="card-body">
@@ -323,7 +396,7 @@
 
         <article class="card">
           <div class="card-head purple">
-            <div><p class="title">TripMind</p><p class="subtitle">Person B</p></div>
+            <div><p class="title">TripMind</p><p class="subtitle">Person E</p></div>
             <div class="num">9</div>
           </div>
           <div class="card-body">
@@ -335,7 +408,7 @@
 
         <article class="card">
           <div class="card-head dark">
-            <div><p class="title">AgriVision</p><p class="subtitle">Person B</p></div>
+            <div><p class="title">AgriVision</p><p class="subtitle">Person E</p></div>
             <div class="num">10</div>
           </div>
           <div class="card-body">
@@ -348,11 +421,11 @@
     </section>
 
     <section class="section">
-      <h2>Apps 11–15</h2>
+      <h2>Apps 11–15 (Person C)</h2>
       <div class="grid">
         <article class="card">
           <div class="card-head primary">
-            <div><p class="title">EcoRoute</p><p class="subtitle">Utilities</p></div>
+            <div><p class="title">EcoRoute</p><p class="subtitle">Person C</p></div>
             <div class="num">11</div>
           </div>
           <div class="card-body">
@@ -364,7 +437,7 @@
 
         <article class="card">
           <div class="card-head success">
-            <div><p class="title">EventPilot</p><p class="subtitle">Utilities</p></div>
+            <div><p class="title">EventPilot</p><p class="subtitle">Person C</p></div>
             <div class="num">12</div>
           </div>
           <div class="card-body">
@@ -376,7 +449,7 @@
 
         <article class="card">
           <div class="card-head orange">
-            <div><p class="title">FoodWise</p><p class="subtitle">Utilities</p></div>
+            <div><p class="title">FoodWise</p><p class="subtitle">Person C</p></div>
             <div class="num">13</div>
           </div>
           <div class="card-body">
@@ -388,7 +461,7 @@
 
         <article class="card">
           <div class="card-head purple">
-            <div><p class="title">LegalLens</p><p class="subtitle">Utilities</p></div>
+            <div><p class="title">LegalLens</p><p class="subtitle">Person C</p></div>
             <div class="num">14</div>
           </div>
           <div class="card-body">
@@ -400,7 +473,7 @@
 
         <article class="card">
           <div class="card-head dark">
-            <div><p class="title">MediFlow</p><p class="subtitle">Utilities</p></div>
+            <div><p class="title">MediFlow</p><p class="subtitle">Person C</p></div>
             <div class="num">15</div>
           </div>
           <div class="card-body">
@@ -413,11 +486,11 @@
     </section>
 
     <section class="section">
-      <h2>Apps 16–20</h2>
+      <h2>Apps 16–20 (Person D)</h2>
       <div class="grid">
         <article class="card">
           <div class="card-head primary">
-            <div><p class="title">BuildTrack AI</p><p class="subtitle">Construction</p></div>
+            <div><p class="title">BuildTrack AI</p><p class="subtitle">Person D</p></div>
             <div class="num">16</div>
           </div>
           <div class="card-body">
@@ -429,7 +502,7 @@
 
         <article class="card">
           <div class="card-head success">
-            <div><p class="title">MuseAI</p><p class="subtitle">Creative</p></div>
+            <div><p class="title">MuseAI</p><p class="subtitle">Person D</p></div>
             <div class="num">17</div>
           </div>
           <div class="card-body">
@@ -441,7 +514,7 @@
 
         <article class="card">
           <div class="card-head orange">
-            <div><p class="title">NewsGuard AI</p><p class="subtitle">Media</p></div>
+            <div><p class="title">NewsGuard AI</p><p class="subtitle">Person D</p></div>
             <div class="num">18</div>
           </div>
           <div class="card-body">
@@ -453,7 +526,7 @@
 
         <article class="card">
           <div class="card-head purple">
-            <div><p class="title">DisasterWatch</p><p class="subtitle">Emergency</p></div>
+            <div><p class="title">DisasterWatch</p><p class="subtitle">Person D</p></div>
             <div class="num">19</div>
           </div>
           <div class="card-body">
@@ -465,7 +538,7 @@
 
         <article class="card">
           <div class="card-head red">
-            <div><p class="title">SpaceOps</p><p class="subtitle">Mission Control</p></div>
+            <div><p class="title">SpaceOps</p><p class="subtitle">Person D</p></div>
             <div class="num">20</div>
           </div>
           <div class="card-body">
@@ -478,11 +551,11 @@
     </section>
 
     <section class="section">
-      <h2>Apps 21–24</h2>
+      <h2>Apps 21–24 (Person E)</h2>
       <div class="grid">
         <article class="card">
           <div class="card-head primary">
-            <div><p class="title">AI Assistant</p><p class="subtitle">Project App</p></div>
+            <div><p class="title">AI Assistant</p><p class="subtitle">Person E</p></div>
             <div class="num">21</div>
           </div>
           <div class="card-body">
@@ -494,7 +567,7 @@
 
         <article class="card">
           <div class="card-head success">
-            <div><p class="title">AI Dashboard</p><p class="subtitle">Project App</p></div>
+            <div><p class="title">AI Dashboard</p><p class="subtitle">Person E</p></div>
             <div class="num">22</div>
           </div>
           <div class="card-body">
@@ -506,7 +579,7 @@
 
         <article class="card">
           <div class="card-head orange">
-            <div><p class="title">Financial Analytics</p><p class="subtitle">Project App</p></div>
+            <div><p class="title">Financial Analytics</p><p class="subtitle">Person E</p></div>
             <div class="num">23</div>
           </div>
           <div class="card-body">
@@ -518,7 +591,7 @@
 
         <article class="card">
           <div class="card-head purple">
-            <div><p class="title">Schema Help Centre</p><p class="subtitle">Project App</p></div>
+            <div><p class="title">Schema Help Centre</p><p class="subtitle">Person E</p></div>
             <div class="num">24</div>
           </div>
           <div class="card-body">
@@ -532,7 +605,7 @@
 
     <footer>
       <p>UI Templates App • Complete Master Catalog</p>
-      <p>All 24 apps are included and linked from the homepage.</p>
+      <p>All 24 apps with glass-morphism UI • Assigned to Person C, D, and E</p>
     </footer>
   </div>
 </body>
