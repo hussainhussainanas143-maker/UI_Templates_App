@@ -1,16 +1,138 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Naveed — Demo Apps</title><style>
-:root{--bg:#f5f6f8;--ink:#14202b;--card:#fff;--line:#d9dee4;--acc:#2f6fed;--mut:#5b6773}
-@media(prefers-color-scheme:dark){:root{--bg:#10161c;--ink:#e8eef4;--card:#18212a;--line:#2a3743;--acc:#6ea0ff;--mut:#9aa8b5}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,"Segoe UI",sans-serif;padding:24px}
-main{max-width:760px;margin:auto}h1{margin:0 0 4px}p{color:var(--mut);margin:0 0 20px}
-ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
-a{display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;color:var(--ink);text-decoration:none}
-a:hover,a:focus-visible{border-color:var(--acc);outline:none}a b{color:var(--acc)}a span{display:block;color:var(--mut);font-size:.9rem}
-</style></head><body><main><h1>Demo Apps</h1><p>All apps use simulated data.</p><ul>
-<li><a href="mediflow.html"><b>MediFlow AI</b><span>App 11 · Hospital operations</span></a></li>
-<li><a href="legallens.html"><b>LegalLens</b><span>App 12 · Contract review</span></a></li>
-<li><a href="eventpilot.html"><b>EventPilot</b><span>App 13 · Live event operations</span></a></li>
-<li><a href="foodwise.html"><b>FoodWise AI</b><span>App 14 · Kitchen waste intelligence</span></a></li>
-<li><a href="ecoroute.html"><b>EcoRoute</b><span>App 15 · Compare routes by carbon</span></a></li>
-</ul></main></body></html>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Applications</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #dbeafe, #f0f9ff);
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        header {
+            background: #1e3a8a;
+            color: white;
+            padding: 30px;
+        }
+
+        header h1 {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 18px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        .card h2 {
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .card a {
+            display: inline-block;
+            text-decoration: none;
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        .card a:hover {
+            background: #1d4ed8;
+        }
+
+        footer {
+            margin-top: 30px;
+            background: #1e3a8a;
+            color: white;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Web Applications</h1>
+        <p>Welcome to the Project Index</p>
+    </header>
+
+    <div class="container">
+
+        <div class="card">
+            <h2>FoodWise</h2>
+            <p>Food management and smart food solutions.</p>
+            <a href="foodwise/index.html">Open FoodWise</a>
+        </div>
+
+        <div class="card">
+            <h2>EventPilot</h2>
+            <p>Event planning and management application.</p>
+            <a href="eventpilot/index.html">Open EventPilot</a>
+        </div>
+
+        <div class="card">
+            <h2>EcoRoute</h2>
+            <p>Eco-friendly route and transportation solution.</p>
+            <a href="ecoroute/index.html">Open EcoRoute</a>
+        </div>
+
+        <div class="card">
+            <h2>MedAIFlow</h2>
+            <p>Smart healthcare and medical AI application.</p>
+            <a href="medaiflow/index.html">Open MedAIFlow</a>
+        </div>
+
+        <div class="card">
+            <h2>LegalLens</h2>
+            <p>Legal information and document assistance platform.</p>
+            <a href="legallens/index.html">Open LegalLens</a>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Web Applications</p>
+    </footer>
+
+</body>
+</html>
+```
