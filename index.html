@@ -1,15 +1,668 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="0; url=./ui-collection-6-10/index.html" />
-    <title>UI Templates App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>
-      window.location.replace('./ui-collection-6-10/index.html');
-    </script>
-  </head>
-  <body>
-    <p>Redirecting to the app...</p>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Templates App - Master Index</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-2: #111827;
+      --card: #ffffff;
+      --card-soft: #eef2ff;
+      --primary: #2563eb;
+      --primary-2: #7c3aed;
+      --accent: #14b8a6;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --shadow: rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #f8fafc 40%, #e0f2fe);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a 60%, #312e81);
+      color: white;
+      border-radius: 22px;
+      padding: 36px 28px;
+      box-shadow: 0 18px 45px var(--shadow);
+      margin-bottom: 30px;
+    }
+
+    .topbar h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: 0.04em;
+    }
+
+    .topbar p {
+      margin: 0;
+      font-size: 1.04rem;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .stats {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 700;
+    }
+
+    .section {
+      margin-top: 42px;
+    }
+
+    .section h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      color: #0f172a;
+      border-bottom: 3px solid #93c5fd;
+      padding-bottom: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.16);
+    }
+
+    .card-head {
+      padding: 16px 18px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 78px;
+    }
+
+    .card-head.primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); }
+    .card-head.success { background: linear-gradient(135deg, #0f766e, #14b8a6); }
+    .card-head.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .card-head.purple { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+    .card-head.dark { background: linear-gradient(135deg, #374151, #111827); }
+
+    .num {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.18);
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      opacity: 0.88;
+      font-size: 0.82rem;
+    }
+
+    .card-body {
+      padding: 18px 18px 20px;
+    }
+
+    .desc {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      min-height: 76px;
+      font-size: 0.95rem;
+    }
+
+    .meta {
+      margin: 0 0 16px;
+      color: #64748b;
+      font-size: 0.75rem;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: white;
+    }
+
+    .btn.secondary {
+      background: #eef2ff;
+      color: var(--text);
+      border: 1px solid #dfe7ff;
+    }
+
+    footer {
+      margin-top: 38px;
+      text-align: center;
+      padding: 24px 12px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 640px) {
+      .container { padding-left: 14px; padding-right: 14px; }
+      .topbar { padding: 26px 18px; }
+      .stats { flex-direction: column; align-items: flex-start; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <h1>UI Templates App</h1>
+      <p>Master index for all application collections and projects.</p>
+      <div class="stats">
+        <span class="pill">24 Apps</span>
+        <span class="pill">5 Collections</span>
+        <span class="pill">4 Project Groups</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2>Apps 1–5: Collection Hub</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="card-head primary">
+            <div>
+              <p class="title">App 1</p>
+              <p class="subtitle">Collection Hub</p>
+            </div>
+            <div class="num">1</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Main app collection overview for the first set of UI templates and gallery items.</p>
+            <p class="meta">Path: /collection/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="collection/index.html">Open App 1</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head success">
+            <div>
+              <p class="title">App 2</p>
+              <p class="subtitle">UI Collection Repo</p>
+            </div>
+            <div class="num">2</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Repository-based UI showcase with modern design samples and reusable components.</p>
+            <p class="meta">Path: /collection/ui-collection-repo/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="collection/ui-collection-repo/index.html">Open App 2</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head orange">
+            <div>
+              <p class="title">App 3</p>
+              <p class="subtitle">Collection Showcase</p>
+            </div>
+            <div class="num">3</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Template gallery for the 6–10 collection with multiple interactive app previews.</p>
+            <p class="meta">Path: /ui-collection-6-10/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="ui-collection-6-10/index.html">Open App 3</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head purple">
+            <div>
+              <p class="title">App 4</p>
+              <p class="subtitle">ResearchLens</p>
+            </div>
+            <div class="num">4</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Research-focused dashboard concept showing smart data and analysis workflows.</p>
+            <p class="meta">Path: /ui-collection-6-10/apps/researchlens/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="ui-collection-6-10/apps/researchlens/index.html">Open App 4</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head dark">
+            <div>
+              <p class="title">App 5</p>
+              <p class="subtitle">CareerPilot</p>
+            </div>
+            <div class="num">5</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Career planning interface designed for skill tracking, job discovery, and user guidance.</p>
+            <p class="meta">Path: /ui-collection-6-10/apps/careerpilot/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="ui-collection-6-10/apps/careerpilot/index.html">Open App 5</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Apps 6–10: Business & Utility</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="card-head primary">
+            <div>
+              <p class="title">App 6</p>
+              <p class="subtitle">FoodWise</p>
+            </div>
+            <div class="num">6</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Food management and smart food solutions for efficient inventory planning.</p>
+            <p class="meta">Path: /Apps 11-15/foodwise.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/foodwise.html">Open App 6</a>
+              <a class="btn secondary" href="Apps 11-15/index.html">Collection</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head success">
+            <div>
+              <p class="title">App 7</p>
+              <p class="subtitle">EventPilot</p>
+            </div>
+            <div class="num">7</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Event planning and management interface for schedules, organizers, and participants.</p>
+            <p class="meta">Path: /Apps 11-15/eventpilot.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/eventpilot.html">Open App 7</a>
+              <a class="btn secondary" href="Apps 11-15/index.html">Collection</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head orange">
+            <div>
+              <p class="title">App 8</p>
+              <p class="subtitle">EcoRoute</p>
+            </div>
+            <div class="num">8</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Transport planning dashboard focused on eco-friendly routes and sustainable navigation.</p>
+            <p class="meta">Path: /Apps 11-15/ecoroute.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/ecoroute.html">Open App 8</a>
+              <a class="btn secondary" href="Apps 11-15/index.html">Collection</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head purple">
+            <div>
+              <p class="title">App 9</p>
+              <p class="subtitle">MedAIFlow</p>
+            </div>
+            <div class="num">9</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Healthcare workflow with AI-assisted support and patient operations surfaces.</p>
+            <p class="meta">Path: /Apps 11-15/mediflow.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/mediflow.html">Open App 9</a>
+              <a class="btn secondary" href="Apps 11-15/index.html">Collection</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head dark">
+            <div>
+              <p class="title">App 10</p>
+              <p class="subtitle">LegalLens</p>
+            </div>
+            <div class="num">10</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Legal information platform for article discovery, assistance, and document support.</p>
+            <p class="meta">Path: /Apps 11-15/legallens.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/legallens.html">Open App 10</a>
+              <a class="btn secondary" href="Apps 11-15/index.html">Collection</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Apps 11–15: Collection Group</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="card-head primary">
+            <div>
+              <p class="title">App 11</p>
+              <p class="subtitle">Analytics Dashboard</p>
+            </div>
+            <div class="num">11</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Core analytics and reporting suite with dashboards and charts.</p>
+            <p class="meta">Collection entry: /Apps 11-15/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/index.html">Open Collection</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head success">
+            <div>
+              <p class="title">App 12</p>
+              <p class="subtitle">CRM System</p>
+            </div>
+            <div class="num">12</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Customer relationship management platform for team collaboration and customer data.</p>
+            <p class="meta">Collection entry: /Apps 11-15/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/index.html">Open Collection</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head orange">
+            <div>
+              <p class="title">App 13</p>
+              <p class="subtitle">Project Manager</p>
+            </div>
+            <div class="num">13</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Project coordination workspace for tasks, delivery timelines, and meeting planning.</p>
+            <p class="meta">Collection entry: /Apps 11-15/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/index.html">Open Collection</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head purple">
+            <div>
+              <p class="title">App 14</p>
+              <p class="subtitle">E-Commerce Hub</p>
+            </div>
+            <div class="num">14</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Storefront and commerce dashboard for product management and transactions.</p>
+            <p class="meta">Collection entry: /Apps 11-15/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/index.html">Open Collection</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head dark">
+            <div>
+              <p class="title">App 15</p>
+              <p class="subtitle">Social Network</p>
+            </div>
+            <div class="num">15</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Social platform concept for profiles, feeds, communities, and secure messaging.</p>
+            <p class="meta">Collection entry: /Apps 11-15/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 11-15/index.html">Open Collection</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Apps 16–20: Project Collection</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="card-head primary">
+            <div>
+              <p class="title">App 16</p>
+              <p class="subtitle">BuildTrack AI</p>
+            </div>
+            <div class="num">16</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Construction intelligence app that monitors project progress and resources.</p>
+            <p class="meta">Path: /Apps 16-20-Project/BuildTrack AI - Construction Intelligence App 16.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 16-20-Project/BuildTrack%20AI%20-%20Construction%20Intelligence%20App%2016.html">Open App 16</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head success">
+            <div>
+              <p class="title">App 17</p>
+              <p class="subtitle">MuseAI</p>
+            </div>
+            <div class="num">17</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Creative idea studio for ideation, design thinking, and collaboration workflows.</p>
+            <p class="meta">Path: /Apps 16-20-Project/MuseAI - Creative Idea Studio App 17.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 16-20-Project/MuseAI%20-%20Creative%20Idea%20Studio%20App%2017.html">Open App 17</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head orange">
+            <div>
+              <p class="title">App 18</p>
+              <p class="subtitle">NewsGuard AI</p>
+            </div>
+            <div class="num">18</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Story intelligence and fact-checking interface with AI summarization support.</p>
+            <p class="meta">Path: /Apps 16-20-Project/NewsGuard AI - Story Intelligence App 18.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 16-20-Project/NewsGuard%20AI%20-%20Story%20Intelligence%20App%2018.html">Open App 18</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head purple">
+            <div>
+              <p class="title">App 19</p>
+              <p class="subtitle">DisasterWatch</p>
+            </div>
+            <div class="num">19</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Emergency command center for disaster monitoring, response planning, and coordination.</p>
+            <p class="meta">Path: /Apps 16-20-Project/DisasterWatch - Emergency Command App 19.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 16-20-Project/DisasterWatch%20-%20Emergency%20Command%20App%2019.html">Open App 19</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head dark">
+            <div>
+              <p class="title">App 20</p>
+              <p class="subtitle">SpaceOps</p>
+            </div>
+            <div class="num">20</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Mission control dashboard with telemetry, live metrics, and operational planning.</p>
+            <p class="meta">Path: /Apps 16-20-Project/SpaceOps - Mission Control App 20.html</p>
+            <div class="actions">
+              <a class="btn primary" href="Apps 16-20-Project/SpaceOps%20-%20Mission%20Control%20App%2020.html">Open App 20</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Apps 21–24: Project Portfolio</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="card-head primary">
+            <div>
+              <p class="title">App 21</p>
+              <p class="subtitle">Schema Help Centre</p>
+            </div>
+            <div class="num">21</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Government schemes and eligibility information portal for simplified navigation.</p>
+            <p class="meta">Path: /projects/schema help centre.project/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="projects/schema%20help%20centre.project/index.html">Open App 21</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head success">
+            <div>
+              <p class="title">App 22</p>
+              <p class="subtitle">AI Assistant</p>
+            </div>
+            <div class="num">22</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Interactive AI interface for workflow assistance and response generation.</p>
+            <p class="meta">Path: /projects/Ui temelations project/ai-assistant/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="projects/Ui%20temelations%20project/ai-assistant/index.html">Open App 22</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head orange">
+            <div>
+              <p class="title">App 23</p>
+              <p class="subtitle">AI Dashboard</p>
+            </div>
+            <div class="num">23</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">AI-powered analytics dashboard designed for operational insight and reporting.</p>
+            <p class="meta">Path: /projects/Ui temelations project/ai-dashboard/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="projects/Ui%20temelations%20project/ai-dashboard/index.html">Open App 23</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head purple">
+            <div>
+              <p class="title">App 24</p>
+              <p class="subtitle">Financial Analytics</p>
+            </div>
+            <div class="num">24</div>
+          </div>
+          <div class="card-body">
+            <p class="desc">Financial analytics experience with KPI cards, charts, and insight panels.</p>
+            <p class="meta">Path: /projects/Ui temelations project/financial-analytics/index.html</p>
+            <div class="actions">
+              <a class="btn primary" href="projects/Ui%20temelations%20project/financial-analytics/index.html">Open App 24</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <p>UI Templates App • Master Catalog</p>
+      <p>Updated collection links for Apps 1–24</p>
+    </footer>
+  </div>
+</body>
 </html>
